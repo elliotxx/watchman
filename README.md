@@ -11,7 +11,6 @@
 * web 框架: gin 1.4
 * 数据库: sqlite3
 
-## 安装
 使用 go modules 安装后端依赖
 ```
 cd api
@@ -22,6 +21,15 @@ go mod tidy
 cd ui
 npm install
 ```
+
+## 使用
+### 使用 Docker 安装
+使用 Docker 构建镜像 & 运行容器
+```
+docker build -f Dockerfile -t watchman .
+docker run -d -p 8081:80 watchman
+```
+浏览器访问 ```127.0.0.1:8081``` 查看效果
 
 ## 功能
 - [ ] 定时任务
