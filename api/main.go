@@ -14,7 +14,7 @@ func main() {
 	var err error
 	api.DB, err = gorm.Open("sqlite3", "watchman.db")
 	if err != nil {
-		panic("failed to connect database")
+		panic("failed to connect database: " + err.Error())
 	}
 	defer api.DB.Close()
 	// 自动迁移模式将保持更新到最新
