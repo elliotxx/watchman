@@ -36,9 +36,17 @@ npm install
 
 ## 笔记
 ## docker 镜像加速
-鉴于国内网络问题，后续拉取 Docker 镜像十分缓慢，我们可以需要配置加速器来解决，我使用的是网易的镜像地址：http://hub-mirror.c.163.com。
+鉴于国内网络问题，后续拉取 Docker 镜像十分缓慢，我们可以需要配置加速器来解决，网易的镜像地址：http://hub-mirror.c.163.com。
 
-新版的 Docker 使用 /etc/docker/daemon.json（Linux） 或者 %programdata%\docker\config\daemon.json（Windows） 来配置 Daemon。
+配置以下文件，设置 docker 镜像仓库代理：
+```
+# linux
+vi /etc/docker/daemon.json（Linux）
+# windows
+%programdata%\docker\config\daemon.json
+# mac
+~/.docker/daemon.json
+```
 
 请在该配置文件中加入（没有该文件的话，请先建一个）：
 ```
@@ -46,3 +54,9 @@ npm install
   "registry-mirrors": ["http://hub-mirror.c.163.com"]
 }
 ```
+
+## 采坑
+### go-sqlite3 需要在编译时开启 cgo 才能工作
+否则报错：Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work.
+解决：
+编译时打开 CGO 开关：CGO_ENABLED=1

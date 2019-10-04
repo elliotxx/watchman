@@ -10,13 +10,13 @@ ENV GO111MODULE=on
 ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
 RUN go mod tidy
 # 编译，生成二进制文件
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o watchman main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static" -o watchman main.go
 
 
 FROM alpine:3.7 AS run
 
 ENV GIN_MODE="release"
-ENV PORT=3000
+# ENV PORT=8080
 
 # 设置alpine的镜像地址为阿里云的地址
 RUN echo "https://mirrors.aliyun.com/alpine/v3.6/main/" > /etc/apk/repositories \
@@ -30,5 +30,4 @@ RUN chmod +x /usr/bin/watchman
 # 后端服务跑起来
 # RUN /usr/bin/watchman
 
-# 暴露的端口
-EXPOSE 3000
+ENTRYPOINT ["watchman"]
