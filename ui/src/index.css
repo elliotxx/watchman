@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  font-size: 18px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/*覆盖antd默认字体大小*/
+/*.ant-form label,*/
+/*.ant-select-lg,*/
+/*.ant-menu-inline .ant-menu-item{*/
+/*  font-size: 18px;*/
+/*}*/
+
+/*表单宽度*/
+.ant-form {
+  max-width: 500px;
+}
+
+/*输入框的高度*/
+/*.ant-input, .ant-select {*/
+/*  height: 40px;*/
+/*}*/
+
+/*使 react-router-dom 中的 Link 渲染后的 a 标签从 block => inline，否则 a 中的文字会顶到下一行*/
+.ant-menu-item > a {
+  display: inline;
+}
