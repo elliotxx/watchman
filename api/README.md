@@ -5,12 +5,21 @@
 * web 框架: gin 1.4
 * 数据库: sqlite3
 
-## 安装
 使用 go modules 安装后端依赖
 ```
 cd api
 go mod tidy
 ```
+
+## 使用
+### 使用 docker 安装
+使用 Docker 构建镜像 & 运行容器
+```
+cd api
+docker build -f Dockerfile -t watchman-api .
+docker run -d -p 8081:8080 watchman-api
+```
+浏览器访问 ```127.0.0.1:8081/job``` 查看效果
 
 ## 数据表设计
 定时任务

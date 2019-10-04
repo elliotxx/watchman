@@ -1,8 +1,10 @@
+# 该后端程序默认端口为 8080
+
 # 编译后端代码，生成二进制文件
 FROM golang:1.12.10 AS build-api
 
 # 拷贝项目代码
-ADD ./api /go/src/api
+ADD . /go/src/api
 # 设置工作目录
 WORKDIR /go/src/api
 
@@ -14,10 +16,7 @@ RUN go mod tidy
 RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static" -o watchman main.go
 
 
-# 构建前端代码，生成静态文件
-FROM node:8 as build-ui
-
-
+# 运行层
 FROM alpine:3.7 AS run
 
 ENV GIN_MODE="release"
@@ -32,7 +31,5 @@ RUN echo "https://mirrors.aliyun.com/alpine/v3.6/main/" > /etc/apk/repositories 
 COPY --from=build-api /go/src/api/watchman /usr/bin/watchman
 RUN chmod +x /usr/bin/watchman
 
-# 后端服务跑起来
-RUN /usr/bin/watchman
-
+# 容器入口，启动容器时运行该命令，且不会被 docker run 提供的命令覆盖
 ENTRYPOINT ["watchman"]

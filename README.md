@@ -93,3 +93,12 @@ ref: https://www.cnblogs.com/davygeek/p/10969434.html
 解决：打开 virtualbox 会发现有个名叫 default 的虚拟机正在运行，docker toolbox 就跑在这上面，然后依次点击 "default 右键设置 => 网络 => 网卡1 => 高级 => 端口转发"，添加一条："Rule 1 | TCP | 127.0.0.1 | 8080 | | 8080"
 
 再在浏览器中访问一下，是不是可以了呢
+
+ref: https://blog.csdn.net/qq_36760953/article/details/83303322
+
+## 参考资料
+* 程序员笔记——如何编写优雅的Dockerfile  
+https://studygolang.com/articles/20102
+
+* Dockerfile语法  
+https://blog.csdn.net/u013755520/article/details/91126933
