@@ -35,7 +35,7 @@ RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static
 FROM alpine:3.7 AS run
 
 ENV GIN_MODE="release"
-# ENV PORT=8080
+ENV GIN_PORT=8080
 
 # 安装必要工具，设置 alpine 的镜像地址为阿里云的地址
 RUN echo "https://mirrors.aliyun.com/alpine/v3.6/main/" > /etc/apk/repositories \

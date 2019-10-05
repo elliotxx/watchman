@@ -104,6 +104,51 @@ ref: https://www.cnblogs.com/davygeek/p/10969434.html
 
 ref: https://blog.csdn.net/qq_36760953/article/details/83303322
 
+### 同一个 docker 容器中，如何同时运行两个进程
+背景：
+在同一个容器中，同时部署了前后端程序，前端需要 nginx，后端程序也要运行，这就要求两个进程同时运行
+
+但是我试过用 ```RUN xxx &``` 和 ```ENTRYPOINT ["nginx", "-g", "daemon off;"]``` 组合的方式，一个通过 RUN 运行，一个用 ENTRYPOINT 容器启动时运行，但是不知道为什么用 RUN 运行的程序没有启动起来。
+
+所以只能想办法用 ENTRYPOINT 同时运行这两个程序
+
+解决：
+解决方法是把两个程序的启动命令都放到一个启动脚本里，然后再 ENTRYPOINT 中运行这个脚本，启动脚本最后跑一个死循环，这样可以保证容器一直运行。
+
+注意这两个程序的输出都写入到日志文件当中，然后把日志文件所在目录通过 VOLUME 方式挂载出来，这样可以防止日志文件在容器中增量到过大。
+
+run.sh 启动脚本样例：
+```
+#!/bin/bash
+ 
+# run watchman
+watchman > /data/watchman.log 2>&1 &
+# run nginx
+nginx -g 'daemon off;' > /data/nginx.log 2>&1 &
+ 
+# just keep this script running
+while [[ true ]]; do
+    sleep 1
+done
+```
+
+
+### 同一个 docker 容器中，前后端分离部署，跨域访问的解决方案
+背景：
+在同一个容器中，同时部署了前后端程序，前端通过 nginx 转发 80 端口进行访问，后端运行在 8080 端口。
+
+前端中有 ajax 请求需要访问后端提供的接口，这个时候就会产生跨域请求问题，用户在浏览器访问前端然后请求 127.0.0.1:8080 显然是不合理的，除非再开启一个后端容器单独跑在 8080 端口，但是这样又背离了部署在同一个容器的初衷。
+
+解决：
+解决办法就是在后端接口加上 /api/v1/ 前缀，然后设置 nginx location 代理 /api/v1 到 8080 端口
+```
+location /api/v1 {
+    proxy_pass   http://127.0.0.1:8080;
+}
+```
+这样前后端请求都是通过 80 端口进入容器，只不过容器中的 nginx 转发了其中的 /api/v1 前缀的请求到后端 8080 端口
+
+
 ## 参考资料
 * 程序员笔记——如何编写优雅的Dockerfile  
 https://studygolang.com/articles/20102
