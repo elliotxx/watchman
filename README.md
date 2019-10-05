@@ -24,7 +24,7 @@ npm install
 ### 使用 Dockerfile 构建镜像 & 运行容器
 ```
 docker build -f Dockerfile -t watchman .
-docker run -d -p 8007:80 watchman
+docker run -d -p 8007:80 --name=watchman watchman
 ```
 浏览器访问 ```127.0.0.1:8007``` 查看效果
 
