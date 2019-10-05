@@ -43,6 +43,15 @@ docker run -d -p 8007:80 --name=watchman registry.cn-shanghai.aliyuncs.com/ellio
 ```
 浏览器访问 ```127.0.0.1:8007``` 查看效果
 
+## 自动构建&部署（私人）
+对要自动构建&部署的版本打一个 tag，然后推送到 github 中
+
+接下来阿里云容器镜像服务会自动拉取代码，构建镜像，然后 ECS 中的 webhooks 服务会拉取镜像，运行脚本自动部署
+```
+git tag -a deploy -m 'deploy version'
+git push origin deploy
+```
+
 ## 功能
 - [ ] 定时任务
     - [ ] 定时执行
