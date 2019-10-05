@@ -62,7 +62,7 @@ class Job extends React.Component {
     handleSwitch = (record) => {
         // 暂停/开始按钮响应函数
         record.status = record.status === 0 ? 1 : 0;
-        axios.put('http://127.0.0.1:8080/job', record)
+        axios.put('/api/v1/job', record)
             .then( res => {
                 console.log(res);
                 if (res.status === 200) {
@@ -84,7 +84,7 @@ class Job extends React.Component {
 
     handleDelete = (record) => {
         // 删除按钮响应函数
-        axios.delete('http://127.0.0.1:8080/job', {data: JSON.stringify(record)})
+        axios.delete('/api/v1/job', {data: JSON.stringify(record)})
             .then( res => {
                 console.log(res);
                 if (res.status === 200) {
@@ -105,7 +105,7 @@ class Job extends React.Component {
 
     syncJobs() {
         // 同步一次 jobs 数据，并更新 state
-        axios.get('http://127.0.0.1:8080/job')
+        axios.get('/api/v1/job')
             .then(res => {
                 console.log(res);
                 let jobs = res.data.data;

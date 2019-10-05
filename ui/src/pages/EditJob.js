@@ -39,7 +39,7 @@ class EditJob extends React.Component {
                 let method = this.state.isEdit ? axios.put : axios.post;
                 if (this.state.isEdit)
                     values.ID = this.state.job.ID;
-                method('http://127.0.0.1:8080/job', values)
+                method('/api/v1/job', values)
                     .then(res => {
                         console.log(res);
                         if (res.status === 200) {
