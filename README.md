@@ -154,6 +154,37 @@ location /api/v1 {
 这样前后端请求都是通过 80 端口进入容器，只不过容器中的 nginx 转发了其中的 /api/v1 前缀的请求到后端 8080 端口
 
 
+### 前端中使用 react-router-dom 在浏览器中直接输入 url 无法访问的问题
+背景：
+前端中使用 react-router-dom 做路由，但是同样的 url 在路由页点击可以正常切换，在浏览器中输入 url 就无法访问了
+
+原因：
+router 设置的路由链接不是真实的链接，需要通过访问路由页 js 才能做转发，直接访问 url 其实是不存在这个资源的
+
+解决：
+将 BrowserRouter 修改为 HashRouter 即可解决，即：
+```
+import {BrowserRouter as Router,Route,Link} from 'react-router-dom'
+```
+修改为：
+```
+import {HashRouter as Router,Route,Link} from 'react-router-dom';
+```
+
+HashRouter 会在 url 前加一个 #，其实就是通过标签的方式标记了对应 url
+
+ref：https://segmentfault.com/q/1010000012959395
+
+
+### nginx 启用 gzip 压缩 js 等文件
+背景：
+发现前端程序用 npm build 之后产生的 js 文件也有 400k，浏览器第一次访问需要 40s 才能加载出来
+
+解决：
+在 nginx 中启动 gzip 压缩 js 等文件，速度提升一半
+
+ref：https://blog.csdn.net/kwy15732621629/article/details/78475021
+
 ## 参考资料
 * 程序员笔记——如何编写优雅的Dockerfile  
 https://studygolang.com/articles/20102
