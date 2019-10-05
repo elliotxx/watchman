@@ -3,13 +3,11 @@
 
 简单来说，更夫是一个Web应用程序，集成有前后端和数据库，可通过 Docker 或者镜像仓库进行一键部署，它的原理是通过在前端配置的定时任务，定时去和数据库中存储的数据对比，如果不一样，代表有更新，发送邮件进行提示，然后更新数据库。
 
-采用同一个仓库管理代码，前后端分离部署的方案
-
 ## 依赖
 * 前端: React（AntDesign）
-* 后端: golang 1.12+
-* web 框架: gin 1.4
-* 数据库: sqlite3
+* 后端: Golang 1.12
+* web 框架: Gin 1.4
+* 数据库: Sqlite3
 
 使用 go modules 安装后端依赖
 ```
@@ -23,18 +21,27 @@ npm install
 ```
 
 ## 使用
-### 使用 Docker 安装
-使用 Docker 构建镜像 & 运行容器
+### 使用 Dockerfile 构建镜像 & 运行容器
 ```
 docker build -f Dockerfile -t watchman .
-docker run -d -p 8081:80 watchman
+docker run -d -p 8007:80 watchman
 ```
-浏览器访问 ```127.0.0.1:8081``` 查看效果
+浏览器访问 ```127.0.0.1:8007``` 查看效果
 
-### 直接拉取 Docker 镜像
+### 使用 Docker hub 拉取镜像 & 运行容器
+使用官方 Docker hub 拉取镜像（可能有些慢）
 ```
-docker push elliotxx/watchman
+docker pull elliotxx/watchman
+docker run -d -p 8007:80 --name=watchman elliotxx/watchman
 ```
+
+或者使用 阿里云容器镜像服务 拉取镜像（国内加速）
+
+```
+docker pull registry.cn-shanghai.aliyuncs.com/elliotxx/watchman
+docker run -d -p 8007:80 --name=watchman registry.cn-shanghai.aliyuncs.com/elliotxx/watchman
+```
+浏览器访问 ```127.0.0.1:8007``` 查看效果
 
 ## 功能
 - [ ] 定时任务
@@ -48,7 +55,7 @@ docker push elliotxx/watchman
 - [ ] 抓取模板定制
 
 ## 笔记
-## docker 镜像加速
+### docker 镜像加速
 鉴于国内网络问题，后续拉取 Docker 镜像十分缓慢，我们可以需要配置加速器来解决，网易的镜像地址：http://hub-mirror.c.163.com。
 
 配置以下文件，设置 docker 镜像仓库代理（如果没有该文件，就创建一个）：
@@ -68,7 +75,7 @@ vi /etc/docker/daemon.json
 }
 ```
 
-## windows docker 安装
+### windows docker 安装
 windows docker 比较麻烦，有两种方式。一种是 docker toolbox，另一种是 docker for windows
 
 推荐使用 docker toolbox，比较简单，国内可以使用阿里云的镜像来下载，下载地址：
@@ -79,11 +86,12 @@ http://mirrors.aliyun.com/docker-toolbox/windows/docker-toolbox/
 
 注意：如果点击 Docker Quickstart Terminal 弹出“找不到 bash”，需要你手动指定 git bash 的安装位置，比如我的就是：“D:\Program Files\Git\bin\bash.exe”
 
-## 采坑
+
 ### go-sqlite3 需要在编译时开启 cgo 才能工作
 否则报错：Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work.
 解决：
 编译时打开 CGO 开关：CGO_ENABLED=1
+
 
 ### standard_init_linux.go:178: exec user process caused "no such file or directory"
 golang docker build 制作完进项后运行报错
@@ -98,6 +106,7 @@ golang docker build 制作完进项后运行报错
 
 ref: https://www.cnblogs.com/davygeek/p/10969434.html
 
+
 ### 使用 docker toolbox 主机无法用localhost访问 只能通过默认的宿主ip
 背景：在 Docker Quickstart Terminal 中运行 ```docker run -d -p 8080:8080 watchman-test:latest``` 启动一个容器的时候，我期望在浏览器中输入 ```127.0.0.1:8080``` 便可以看到容器中 webapp 的返回结果，但却访问不到该地址
 
@@ -108,6 +117,7 @@ ref: https://www.cnblogs.com/davygeek/p/10969434.html
 再在浏览器中访问一下，是不是可以了呢
 
 ref: https://blog.csdn.net/qq_36760953/article/details/83303322
+
 
 ### 同一个 docker 容器中，如何同时运行两个进程
 背景：
