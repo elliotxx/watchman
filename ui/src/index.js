@@ -8,7 +8,7 @@ import EditTemplate from './pages/EditTemplate'
 import Template from './pages/Template'
 import 'antd/dist/antd.css';
 import './index.css';
-import { BrowserRouter, Route, Link, Switch } from 'react-router-dom';
+import { HashRouter, Route, Link, Switch } from 'react-router-dom';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Title } = Typography;
@@ -26,7 +26,7 @@ class App extends React.Component {
 
     render() {
         return (
-            <BrowserRouter>
+            <HashRouter>
                 <Layout style={{ minHeight: '100vh' }}>
                     {/*左侧导航条*/}
                     <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
@@ -74,7 +74,7 @@ class App extends React.Component {
                         <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
                     </Layout>
                 </Layout>
-            </BrowserRouter>
+            </HashRouter>
         );
     }
 }
