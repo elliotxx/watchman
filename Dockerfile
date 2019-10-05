@@ -55,8 +55,12 @@ RUN chmod +x /usr/bin/watchman
 COPY --from=build-ui /root/ui/build /usr/share/nginx/html
 EXPOSE 80
 
-# 后台运行 nginx
-RUN service nginx start
+# 指定数据卷和当前运行目录
+VOLUME /data
+WORKDIR /data
+
+# 拷贝运行脚本，支持后台运行两个进程
+COPY run.sh /root/run.sh
 
 # 容器入口，启动容器时运行该命令，且不会被 docker run 提供的命令覆盖
-ENTRYPOINT [watchman]
+ENTRYPOINT ["/bin/bash","/root/run.sh"]

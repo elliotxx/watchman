@@ -59,7 +59,7 @@ vi /etc/docker/daemon.json
 请在该配置文件中加入：
 ```
 {
-  "registry-mirrors": ["http://hub-mirror.c.163.com"]
+  "registry-mirrors": ["http://hub-mirror.c.163.com","https://registry.docker-cn.com"]
 }
 ```
 
