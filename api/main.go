@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"os"
 	"time"
 	"watchman-api/api"
 )
@@ -34,11 +35,16 @@ func main() {
 	}))
 
 	// 添加接口路由及响应函数
-	r.POST("/job", api.AddJob)
-	r.DELETE("/job", api.DeleteJob)
-	r.PUT("/job", api.UpdateJob)
-	r.GET("/job", api.ListJob)
+	r.POST("/api/v1/job", api.AddJob)
+	r.DELETE("/api/v1/job", api.DeleteJob)
+	r.PUT("/api/v1/job", api.UpdateJob)
+	r.GET("/api/v1/job", api.ListJob)
 
-	// 让服务跑起来，默认监听 0.0.0.0:8080
-	r.Run()
+	// 让服务跑起来，默认监听 0.0.0.0:8080，也可以通过环境变量 GIN_PORT 指定
+	port := os.Getenv("GIN_PORT")
+	if port == "" {
+		r.Run()
+	} else {
+		r.Run(":" + port)
+	}
 }
