@@ -31,6 +31,11 @@ docker run -d -p 8081:80 watchman
 ```
 浏览器访问 ```127.0.0.1:8081``` 查看效果
 
+### 直接拉取 Docker 镜像
+```
+docker push elliotxx/watchman
+```
+
 ## 功能
 - [ ] 定时任务
     - [ ] 定时执行
