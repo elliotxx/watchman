@@ -44,9 +44,19 @@ docker run -d -p 8007:80 --name=watchman registry.cn-shanghai.aliyuncs.com/ellio
 浏览器访问 ```127.0.0.1:8007``` 查看效果
 
 ## 自动构建&部署（私人）
-对要自动构建&部署的版本打一个 tag，然后推送到 github 中
+### 要触发 自动构建，需要推送 release-v 前缀的 tag
+示例：push 一个名为 ```release-v0.1.2``` 的 tag，docker hub 和 阿里云容器镜像服务 将同时开始自动构建，生成的镜像 tag 为 0.1.2
+支持：docker hub 和 阿里云容器镜像服务 自动构建
+具体：
+```
+git tag -a release-v0.1.2 -m 'v0.1.2'
+git push origin release-v0.1.2
+```
 
-接下来阿里云容器镜像服务会自动拉取代码，构建镜像，然后 ECS 中的 webhooks 服务会拉取镜像，运行脚本自动部署
+### 要触发 自动部署，需要推送名为 deploy 的 tag
+示例：push 一个名为 ```deploy``` 的 tag，docker hub 和 阿里云容器镜像服务 将同时开始自动构建，生成的镜像 tag 为 deploy，然后云服务器上会自动拉取镜像，最后运行镜像
+原理：通过阿里云容器镜像服务自动构建镜像，通过云服务器上的 webhooks 服务自动部署
+具体：
 ```
 git tag -a deploy -m 'deploy version'
 git push origin deploy
