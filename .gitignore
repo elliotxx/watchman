@@ -1,4 +1,5 @@
 *.DS_Store
 .idea/
-cmd/
 *.db
+*.exe
+cmd/watchman

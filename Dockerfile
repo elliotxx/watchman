@@ -27,7 +27,7 @@ ENV GO111MODULE=on
 ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
 RUN go mod tidy
 # 编译，生成二进制文件
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static" -o watchman main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static" -o cmd/watchman cmd/main.go
 
 
 
@@ -48,7 +48,7 @@ RUN echo "https://mirrors.aliyun.com/alpine/v3.6/main/" > /etc/apk/repositories 
 COPY default.conf /etc/nginx/conf.d/default.conf
 
 # 拷贝 build-api 层编译后的二进制文件到当前层
-COPY --from=build-api /root/api/watchman /usr/bin/watchman
+COPY --from=build-api /root/api/cmd/watchman /usr/bin/watchman
 RUN chmod +x /usr/bin/watchman
 
 # 拷贝 build-ui 层构建后的静态文件目录到当前层
