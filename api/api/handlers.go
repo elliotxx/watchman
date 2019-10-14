@@ -2,7 +2,9 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 	"github.com/jinzhu/gorm"
+	"github.com/robfig/cron/v3"
 	"net/http"
 	"strconv"
 	"time"
@@ -26,15 +28,30 @@ func AddJob(c *gin.Context) {
 		})
 		return
 	}
-	// 写入数据库
-	err := DB.Create(&job).Error
+
+	// 添加定时任务到 cron 调度器
+	entryID, err := Cron.AddFunc(job.Cron, func() { WatchJob(job) })
 	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "定时任务在调度器中创建失败",
+			"reason":  err,
+		})
+		return
+	}
+	glog.Info(entryID)
+	job.EntryID = int(entryID)
+
+	// 写入数据库
+	err = DB.Create(&job).Error
+	if err != nil {
+		Cron.Remove(cron.EntryID(job.EntryID))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务创建失败",
 			"reason":  err,
 		})
 		return
 	}
+
 	// 返回 response
 	c.JSON(http.StatusOK, gin.H{
 		"message": "定时任务创建成功",
@@ -59,6 +76,7 @@ func DeleteJob(c *gin.Context) {
 		})
 		return
 	}
+
 	// 根据任务名找到该任务，并删除它
 	// 手动软删除: 如果模型有DeletedAt字段，它将自动获得软删除功能！ 那么在调用Delete时不会从数据库中永久删除，而是只将字段DeletedAt的值设置为当前时间。
 	// 这里手动进行 update 来软删除
@@ -71,6 +89,10 @@ func DeleteJob(c *gin.Context) {
 		})
 		return
 	}
+
+	// 在 cron 调度器中删除该任务
+	Cron.Remove(cron.EntryID(job.EntryID))
+
 	// 返回 response
 	c.JSON(http.StatusOK, gin.H{
 		"message": "定时任务删除成功",
@@ -95,15 +117,31 @@ func UpdateJob(c *gin.Context) {
 		})
 		return
 	}
-	// 根据任务名找到该任务，并更新它
-	err := DB.Where("id = ?", job.ID).Save(&job).Error
+
+	// 在 cron 调度器中更新对应任务
+	Cron.Remove(cron.EntryID(job.EntryID))
+	entryID, err := Cron.AddFunc(job.Cron, func() { WatchJob(job) })
 	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "定时任务在调度器中创建失败",
+			"reason":  err,
+		})
+		return
+	}
+	job.EntryID = int(entryID)
+	glog.Info(job.EntryID)
+
+	// 根据任务名找到该任务，并更新它
+	err = DB.Where("name = ?", job.Name).Save(&job).Error
+	if err != nil {
+		Cron.Remove(cron.EntryID(job.EntryID))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务更新失败",
 			"reason":  err,
 		})
 		return
 	}
+
 	// 返回 response
 	c.JSON(http.StatusOK, gin.H{
 		"message": "定时任务更新成功",
