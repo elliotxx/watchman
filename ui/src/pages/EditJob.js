@@ -11,6 +11,7 @@ import {
 import { InputCron } from 'antcloud-react-crons'
 import { Link } from 'react-router-dom'
 import axios from 'axios';
+import { globalConfig } from '../config'
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -39,7 +40,7 @@ class EditJob extends React.Component {
                 let method = this.state.isEdit ? axios.put : axios.post;
                 if (this.state.isEdit)
                     values.ID = this.state.job.ID;
-                method('/api/v1/job', values)
+                method(globalConfig.rootPath + '/api/v1/job', values)
                     .then(res => {
                         console.log(res);
                         if (res.status === 200) {
