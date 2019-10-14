@@ -9,6 +9,7 @@ import Template from './pages/Template'
 import 'antd/dist/antd.css';
 import './index.css';
 import { HashRouter, Route, Link, Switch } from 'react-router-dom';
+import { globalConfig } from "./config";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Title } = Typography;
@@ -25,6 +26,8 @@ class App extends React.Component {
     };
 
     render() {
+        // 设置主页标题
+        document.title = globalConfig.rootTitle;
         return (
             <HashRouter>
                 <Layout style={{ minHeight: '100vh' }}>

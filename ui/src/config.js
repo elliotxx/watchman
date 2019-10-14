@@ -4,4 +4,7 @@ export const globalConfig = {
     rootPath : 'http://localhost:8080',
     // 线上环境
     // rootPath : '',
+
+    // 主页标题
+    rootTitle : 'Watchman 更夫'
 };
