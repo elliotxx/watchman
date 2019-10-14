@@ -147,6 +147,11 @@ class EditJob extends React.Component {
                         initialValue: this.state.isEdit? this.state.job.content : '',
                     })(<TextArea rows={4} />)}
                 </Form.Item>
+                <Form.Item label="" style={{disable: true}}>
+                    {getFieldDecorator('entryId', {
+                        initialValue: 0,
+                    })(<div/>)}
+                </Form.Item>
                 <Form.Item>
                     <Button type="primary" htmlType="submit">
                         { this.state.isEdit? '提交' : '创建' }

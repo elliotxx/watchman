@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, message, Radio, Tag, Badge } from 'antd';
+import { Table, Button, message, Radio, Tag, Badge, Tooltip, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { globalConfig } from '../config'
@@ -11,6 +11,11 @@ class Job extends React.Component {
     };
 
     columns = [
+        {
+            title: <Tooltip placement="right" title="定时任务在调度器中的 ID"> EntryID <Icon type="info-circle" theme="twoTone" /></Tooltip>,
+            dataIndex: 'entryId',
+            key: 'entryId',
+        },
         {
             title: '任务名称',
             dataIndex: 'name',
@@ -80,7 +85,7 @@ class Job extends React.Component {
                 else
                     message.error(e.message);
             });
-    }
+    };
 
     handleDelete = (record) => {
         // 删除按钮响应函数
