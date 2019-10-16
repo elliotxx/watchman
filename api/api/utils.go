@@ -39,19 +39,38 @@ func WatchJob(job Job) error {
 	html := string(body)
 	//fmt.Println(html)
 
-	// 匹配指定内容
+	// 匹配指定内容（获取新值）
 	glog.Infof(infoPrefix+"Matching target item...", job.ID, job.Name)
 	r, _ := regexp.Compile(`<a class="blue" href=".*?" data-eid="qd_G19" data-cid=".*?" title=".*?" target="_blank">(.*?)</a><i>.*?</i><em class="time">.*?</em>`)
 	result := r.FindStringSubmatch(html)
 	if len(result) >= 2 {
 		newValue = result[1]
-		fmt.Println(newValue)
+		glog.Infof(infoPrefix+"Match to target: %s", job.ID, job.Name, newValue)
 	} else {
 		return fmt.Errorf("Don`t match target")
 	}
 
+	// 从数据库中取出当前旧值
+	tmpJob := Job{}
+	err = DB.First(&tmpJob, job.ID).Error
+	if err != nil {
+		return err
+	}
+	oldValue = tmpJob.OldValue
+
 	// 判断指定内容和数据库中是否一样
 	glog.Infof(infoPrefix+"Checking new value '%s' vs. old value '%s'...", job.ID, job.Name, newValue, oldValue)
+	if newValue == oldValue {
+		glog.Infof(infoPrefix+"New value == old value, skipping", job.ID, job.Name)
+	} else {
+		glog.Infof(infoPrefix+"New value != old value, updating old value and sending notification...", job.ID, job.Name)
+		// 更新旧值
+		err = DB.Model(&job).Update("old_value", newValue).Error
+		if err != nil {
+			return err
+		}
+		// 发送通知
+	}
 	return nil
 }
 

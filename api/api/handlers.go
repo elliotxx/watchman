@@ -38,8 +38,10 @@ func AddJob(c *gin.Context) {
 		})
 		return
 	}
-	glog.Info(entryID)
 	job.EntryID = int(entryID)
+
+	// 输出当前调度器中的所有定时任务
+	PrintAllJobsEntryID()
 
 	// 写入数据库
 	err = DB.Create(&job).Error
@@ -104,6 +106,9 @@ func DeleteJob(c *gin.Context) {
 	// 在 cron 调度器中删除该任务
 	Cron.Remove(cron.EntryID(entryID))
 
+	// 输出当前调度器中的所有定时任务
+	PrintAllJobsEntryID()
+
 	// 返回 response
 	c.JSON(http.StatusOK, gin.H{
 		"message": "定时任务删除成功",
@@ -159,7 +164,7 @@ func UpdateJob(c *gin.Context) {
 		job.EntryID = 0
 	}
 
-	// 输出调度器中的所有定时任务
+	// 输出当前调度器中的所有定时任务
 	PrintAllJobsEntryID()
 
 	// 根据任务名找到该任务，并更新它
