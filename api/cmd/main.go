@@ -3,13 +3,45 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	cron "github.com/robfig/cron/v3"
+	"github.com/robfig/cron/v3"
 	"os"
 	"time"
 	"watchman-api/api"
 )
+
+func syncJobsFromDB() error {
+	// 同步数据库中存在的定时任务
+	jobs := []api.Job{}
+	// 取出数据库中存储的所有定时任务
+	err := api.DB.Find(&jobs).Error
+	if err != nil {
+		return err
+	}
+	// 遍历每个定时任务
+	for _, job := range jobs {
+		glog.Info(job)
+		if job.Status != 0 || job.DeletedAt != nil {
+			continue
+		}
+		entryID, err := api.Cron.AddFunc(job.Cron, func() { api.WatchJob(job) })
+		if err != nil {
+			return err
+		}
+		err = api.DB.Model(&job).Update("EntryID", entryID).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	// 输出调度器中的所有定时任务
+	for _, c := range api.Cron.Entries() {
+		glog.Info(c.ID)
+	}
+	return nil
+}
 
 func main() {
 	// 初始化阶段
@@ -26,6 +58,11 @@ func main() {
 
 	// 创建&开始 cron 实例
 	api.Cron = cron.New()
+	// 同步数据库中存在的定时任务
+	err = syncJobsFromDB()
+	if err != nil {
+		glog.Error(err.Error())
+	}
 	api.Cron.Start()
 
 	// 创建 gin 实例

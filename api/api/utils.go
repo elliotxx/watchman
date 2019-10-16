@@ -1,6 +1,9 @@
 package api
 
-import "github.com/golang/glog"
+import (
+	"fmt"
+	"github.com/golang/glog"
+)
 
 // 定时任务通用 Job
 func WatchJob(job Job) {
@@ -30,4 +33,24 @@ func isJobExistByID(id uint) bool {
 	} else {
 		return true
 	}
+}
+
+// 根据 ID 获取指定 Job 在数据库中的 EntryID
+func getJobEntryIDByID(id uint) (int, error) {
+	var err error
+	job := Job{}
+	err = DB.First(&job, id).Error
+	if err != nil {
+		return 0, err
+	}
+	return job.EntryID, nil
+}
+
+// 输出调度器中的所有定时任务
+func printAllJobsEntryID() {
+	var result string
+	for _, c := range Cron.Entries() {
+		result += fmt.Sprintf("%d ", c.ID)
+	}
+	glog.Infof("Current all jobs: %s", result)
 }

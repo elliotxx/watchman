@@ -11,11 +11,11 @@ class Job extends React.Component {
     };
 
     columns = [
-        {
-            title: <Tooltip placement="right" title="定时任务在调度器中的 ID"> EntryID <Icon type="info-circle" theme="twoTone" /></Tooltip>,
-            dataIndex: 'entryId',
-            key: 'entryId',
-        },
+        // {
+        //     title: <Tooltip placement="right" title="定时任务在调度器中的 ID"> EntryID <Icon type="info-circle" theme="twoTone" /></Tooltip>,
+        //     dataIndex: 'entryId',
+        //     key: 'entryId',
+        // },
         {
             title: '任务名称',
             dataIndex: 'name',

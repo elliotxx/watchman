@@ -34,7 +34,7 @@ func AddJob(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务在调度器中创建失败",
-			"reason":  err,
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -47,7 +47,7 @@ func AddJob(c *gin.Context) {
 		Cron.Remove(cron.EntryID(job.EntryID))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务创建失败",
-			"reason":  err,
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -77,21 +77,32 @@ func DeleteJob(c *gin.Context) {
 		return
 	}
 
+	// 获取指定 ID 的定时任务在数据库中的 EntryID，因为请求传递过来的 EntryID 不一定正确
+	glog.Info(job.ID)
+	entryID, err := getJobEntryIDByID(job.ID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "从数据库中获取指定 ID 的定时任务失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
 	// 根据任务名找到该任务，并删除它
 	// 手动软删除: 如果模型有DeletedAt字段，它将自动获得软删除功能！ 那么在调用Delete时不会从数据库中永久删除，而是只将字段DeletedAt的值设置为当前时间。
 	// 这里手动进行 update 来软删除
 	now := time.Now()
-	err := DB.Model(&job).Updates(Job{Name: job.Name + now.String(), Model: gorm.Model{DeletedAt: &now}}).Error
+	err = DB.Model(&job).Updates(Job{Name: job.Name + now.String(), Model: gorm.Model{DeletedAt: &now}, EntryID: 0, Status: 1}).Error
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务删除失败",
-			"reason":  err,
+			"reason":  err.Error(),
 		})
 		return
 	}
 
 	// 在 cron 调度器中删除该任务
-	Cron.Remove(cron.EntryID(job.EntryID))
+	Cron.Remove(cron.EntryID(entryID))
 
 	// 返回 response
 	c.JSON(http.StatusOK, gin.H{
@@ -103,6 +114,7 @@ func DeleteJob(c *gin.Context) {
 func UpdateJob(c *gin.Context) {
 	// 从 post form 中提取参数
 	var job Job
+	var err error
 	if c.BindJSON(&job) != nil {
 		// 解析失败
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -118,26 +130,45 @@ func UpdateJob(c *gin.Context) {
 		return
 	}
 
-	// 在 cron 调度器中更新对应任务
-	Cron.Remove(cron.EntryID(job.EntryID))
-	entryID, err := Cron.AddFunc(job.Cron, func() { WatchJob(job) })
+	// 获取指定 ID 的定时任务在数据库中的 EntryID，因为请求传递过来的 EntryID 不一定正确
+	entryID, err := getJobEntryIDByID(job.ID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "定时任务在调度器中创建失败",
-			"reason":  err,
+			"message": "从数据库中获取指定 ID 的定时任务失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
-	job.EntryID = int(entryID)
-	glog.Info(job.EntryID)
+	job.EntryID = entryID
+	glog.Info(job.EntryID, job.Status)
+
+	// 在 cron 调度器中更新对应任务
+	Cron.Remove(cron.EntryID(job.EntryID))
+	if job.Status == 0 {
+		// status = 0 代表运行， 1 代表暂停
+		entryID, err := Cron.AddFunc(job.Cron, func() { WatchJob(job) })
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": "定时任务在调度器中创建失败",
+				"reason":  err.Error(),
+			})
+			return
+		}
+		job.EntryID = int(entryID)
+	} else {
+		job.EntryID = 0
+	}
+
+	// 输出调度器中的所有定时任务
+	printAllJobsEntryID()
 
 	// 根据任务名找到该任务，并更新它
-	err = DB.Where("name = ?", job.Name).Save(&job).Error
+	err = DB.Where("id = ?", job.ID).Save(&job).Error
 	if err != nil {
 		Cron.Remove(cron.EntryID(job.EntryID))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务更新失败",
-			"reason":  err,
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -164,7 +195,7 @@ func ListJob(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务获取失败",
-			"reason":  err,
+			"reason":  err.Error(),
 		})
 		return
 	}
