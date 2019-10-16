@@ -160,7 +160,7 @@ func UpdateJob(c *gin.Context) {
 	}
 
 	// 输出调度器中的所有定时任务
-	printAllJobsEntryID()
+	PrintAllJobsEntryID()
 
 	// 根据任务名找到该任务，并更新它
 	err = DB.Where("id = ?", job.ID).Save(&job).Error

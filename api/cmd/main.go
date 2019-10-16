@@ -37,9 +37,7 @@ func syncJobsFromDB() error {
 	}
 
 	// 输出调度器中的所有定时任务
-	for _, c := range api.Cron.Entries() {
-		glog.Info(c.ID)
-	}
+	api.PrintAllJobsEntryID()
 	return nil
 }
 

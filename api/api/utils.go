@@ -11,7 +11,10 @@ import (
 // 定时任务通用 Job
 func WatchJob(job Job) error {
 	// 功能：爬取目标页面指定内容，和数据库中对比，如果不一样，就发送邮件通知，如果一样，就什么也不做
+	var oldValue, newValue string
+	infoPrefix := "[Job#%d][%s] "
 	// 爬取目标页面 html
+	glog.Infof(infoPrefix+"Crawling target page...", job.ID, job.Name)
 	// 生成client客户端
 	client := &http.Client{}
 	// 生成Request对象
@@ -34,19 +37,21 @@ func WatchJob(job Job) error {
 		return err
 	}
 	html := string(body)
-	fmt.Println(html)
+	//fmt.Println(html)
 
 	// 匹配指定内容
+	glog.Infof(infoPrefix+"Matching target item...", job.ID, job.Name)
 	r, _ := regexp.Compile(`<a class="blue" href=".*?" data-eid="qd_G19" data-cid=".*?" title=".*?" target="_blank">(.*?)</a><i>.*?</i><em class="time">.*?</em>`)
 	result := r.FindStringSubmatch(html)
 	if len(result) >= 2 {
-		fmt.Println(result[1])
+		newValue = result[1]
+		fmt.Println(newValue)
 	} else {
-		return fmt.Errorf("Don`t found target")
+		return fmt.Errorf("Don`t match target")
 	}
 
 	// 判断指定内容和数据库中是否一样
-	glog.Info("job name: ", job.Name)
+	glog.Infof(infoPrefix+"Checking new value '%s' vs. old value '%s'...", job.ID, job.Name, newValue, oldValue)
 	return nil
 }
 
@@ -84,7 +89,7 @@ func getJobEntryIDByID(id uint) (int, error) {
 }
 
 // 输出调度器中的所有定时任务
-func printAllJobsEntryID() {
+func PrintAllJobsEntryID() {
 	var result string
 	for _, c := range Cron.Entries() {
 		result += fmt.Sprintf("%d ", c.ID)
