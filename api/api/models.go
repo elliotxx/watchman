@@ -14,3 +14,9 @@ type Job struct {
 	EntryID  int    `json:"entryId" gorm:"not null"`            // cron 调度器的 job id
 	OldValue string `json:"oldValue" gorm:"type:varchar(1000)"` // 该任务抓取目标的旧值
 }
+
+type Account struct {
+	gorm.Model
+	Email    string `json:"name" gorm:"not null;unique"` // 邮箱
+	Password string `json:"password" gorm:"not null"`    // 邮箱密码 / 授权码
+}
