@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, message, Radio, Tag, Badge, Tooltip, Icon } from 'antd';
+import { Table, Button, message, Radio, Tag, Badge } from 'antd';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { globalConfig } from '../config'

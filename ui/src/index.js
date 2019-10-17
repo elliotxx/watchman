@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import { Layout, Menu, Icon, Typography } from 'antd';
 import Job from './pages/Job'
 import EditJob from './pages/EditJob'
-import Setting from './pages/Setting'
+import Account from './pages/Account'
+import EditAccount from './pages/EditAccount'
 import EditTemplate from './pages/EditTemplate'
 import Template from './pages/Template'
 import 'antd/dist/antd.css';
@@ -39,9 +40,9 @@ class App extends React.Component {
                                 <Icon type="pie-chart" />
                                 <Link to='/job'>定时任务</Link>
                             </Menu.Item>
-                            <Menu.Item key="2" link='/setting'>
+                            <Menu.Item key="2" link='/account'>
                                 <Icon type="user" />
-                                <Link to='/setting'>提醒配置</Link>
+                                <Link to='/account'>通知账户</Link>
                             </Menu.Item>
                             <Menu.Item key="3">
                                 <Icon type="file" />
@@ -67,7 +68,8 @@ class App extends React.Component {
                                     <Route exact path='/' breadcrumbName="首页" component={Job} />
                                     <Route exact path='/job' breadcrumbName="定时任务" component={Job} />
                                     <Route exact path='/editjob' breadcrumbName="创建任务" component={EditJob} />
-                                    <Route exact path='/setting' breadcrumbName="提醒配置" component={Setting} />
+                                    <Route exact path='/account' breadcrumbName="通知账户" component={Account} />
+                                    <Route exact path='/editaccount' breadcrumbName="添加账户" component={EditAccount} />
                                     <Route exact path='/template' breadcrumbName="模板配置" component={Template} />
                                     <Route exact path='/edittemplate' breadcrumbName="创建模板" component={EditTemplate} />
                                 </Switch>
