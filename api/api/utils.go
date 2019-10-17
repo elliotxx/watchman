@@ -14,6 +14,7 @@ func WatchJob(job Job) error {
 	var oldValue, newValue string
 	infoPrefix := "[Job#%d][%s] "
 	// 爬取目标页面 html
+	glog.Infof("[Job#%d][%s][%s][Status:%d][EntryID:%d][%s] Start.", job.ID, job.Name, job.Cron, job.Status, job.EntryID, job.OldValue)
 	glog.Infof(infoPrefix+"Crawling target page...", job.ID, job.Name)
 	// 生成client客户端
 	client := &http.Client{}
@@ -23,13 +24,13 @@ func WatchJob(job Job) error {
 		return err
 	}
 	// 添加Header
-	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6")
+	req.Header.Add("User-Agent", UserAgent)
 	// 发起请求
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
 	}
-	// 设定关闭响应体
+	// 最后关闭响应体
 	defer resp.Body.Close()
 	// 读取响应体
 	body, err := ioutil.ReadAll(resp.Body)
@@ -37,16 +38,16 @@ func WatchJob(job Job) error {
 		return err
 	}
 	html := string(body)
-	//fmt.Println(html)
 
 	// 匹配指定内容（获取新值）
 	glog.Infof(infoPrefix+"Matching target item...", job.ID, job.Name)
-	r, _ := regexp.Compile(`<a class="blue" href=".*?" data-eid="qd_G19" data-cid=".*?" title=".*?" target="_blank">(.*?)</a><i>.*?</i><em class="time">.*?</em>`)
+	r, _ := regexp.Compile(job.Pattern)
 	result := r.FindStringSubmatch(html)
 	if len(result) >= 2 {
 		newValue = result[1]
 		glog.Infof(infoPrefix+"Match to target: %s", job.ID, job.Name, newValue)
 	} else {
+		glog.Infof(infoPrefix+"Don`t match target", job.ID, job.Name)
 		return fmt.Errorf("Don`t match target")
 	}
 
@@ -71,6 +72,7 @@ func WatchJob(job Job) error {
 		}
 		// 发送通知
 	}
+	glog.Infof("[Job#%d][%s][%s][Status:%d][EntryID:%d][%s] End.", job.ID, job.Name, job.Cron, job.Status, job.EntryID, job.OldValue)
 	return nil
 }
 
@@ -111,7 +113,7 @@ func getJobEntryIDByID(id uint) (int, error) {
 func PrintAllJobsEntryID() {
 	var result string
 	for _, c := range Cron.Entries() {
-		result += fmt.Sprintf("%d ", c.ID)
+		result += fmt.Sprintf("%d %s", c.ID, c.Next.String())
 	}
 	glog.Infof("Current all jobs: %s", result)
 }

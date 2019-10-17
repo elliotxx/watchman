@@ -1,7 +1,13 @@
 package api
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/golang/glog"
+	"github.com/jinzhu/gorm"
+)
 
+// 各类结构体定义
+
+// 数据库 Model
 type Job struct {
 	gorm.Model
 	Name     string `json:"name" gorm:"not null;unique"`        // 任务名称，设置字段为非空并唯一
@@ -19,4 +25,17 @@ type Account struct {
 	gorm.Model
 	Email    string `json:"name" gorm:"not null;unique"` // 邮箱
 	Password string `json:"password" gorm:"not null"`    // 邮箱密码 / 授权码
+}
+
+// JobFunc 定义
+type JobFunc struct {
+	Job Job // 包含定时任务运行的必要信息，比如抓取目标 URL，匹配规则等
+}
+
+func (j JobFunc) Run() {
+	// 定时任务到时间时会运行 Run()
+	err := WatchJob(j.Job)
+	if err != nil {
+		glog.Error(err.Error())
+	}
 }

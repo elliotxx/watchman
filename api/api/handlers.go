@@ -30,7 +30,8 @@ func AddJob(c *gin.Context) {
 	}
 
 	// 添加定时任务到 cron 调度器
-	entryID, err := Cron.AddFunc(job.Cron, func() { WatchJob(job) })
+	jobFunc := JobFunc{Job: job}
+	entryID, err := Cron.AddJob(job.Cron, jobFunc)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务在调度器中创建失败",
@@ -151,7 +152,8 @@ func UpdateJob(c *gin.Context) {
 	Cron.Remove(cron.EntryID(job.EntryID))
 	if job.Status == 0 {
 		// status = 0 代表运行， 1 代表暂停
-		entryID, err := Cron.AddFunc(job.Cron, func() { WatchJob(job) })
+		jobFunc := JobFunc{Job: job}
+		entryID, err := Cron.AddJob(job.Cron, jobFunc)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "定时任务在调度器中创建失败",

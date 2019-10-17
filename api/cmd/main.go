@@ -26,10 +26,13 @@ func syncJobsFromDB() error {
 		if job.Status != 0 || job.DeletedAt != nil {
 			continue
 		}
-		entryID, err := api.Cron.AddFunc(job.Cron, func() { api.WatchJob(job) })
+		// 在 Cron 调度器中创建新任务
+		jobFunc := api.JobFunc{Job: job}
+		entryID, err := api.Cron.AddJob(job.Cron, jobFunc)
 		if err != nil {
 			return err
 		}
+		// 更新数据库中的 EntryID 字段
 		err = api.DB.Model(&job).Update("EntryID", entryID).Error
 		if err != nil {
 			return err
