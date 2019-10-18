@@ -81,7 +81,7 @@ class Account extends React.Component {
 
     syncAccounts = () => {
         // 同步一次 accounts 数据，并更新 state
-        return axios.get(globalConfig.rootPath + '/api/v1/account')
+        axios.get(globalConfig.rootPath + '/api/v1/account')
             .then(res => {
                 console.log(res);
                 let accounts = res.data.data;

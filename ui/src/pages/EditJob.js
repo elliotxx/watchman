@@ -19,10 +19,12 @@ const { TextArea } = Input;
 class EditJob extends React.Component {
     state = {
         isEdit: false,  // 编辑模式
+        emails: [],     // 已经添加的 emails 们
     };
 
     constructor(props) {
         super(props);
+        this.getAllAccounts();
         if (props.location.state && props.location.state.job) {
             this.state = {
                 isEdit: true,
@@ -30,6 +32,33 @@ class EditJob extends React.Component {
             }
         }
     }
+    getAllAccounts = () => {
+        // 获取所有 accounts 数据，并更新 state
+        axios.get(globalConfig.rootPath + '/api/v1/account')
+            .then(res => {
+                console.log(res);
+                let accounts = res.data.data;
+                let emails = accounts.map((account) => {return account.email;});
+                this.setState({'emails': emails});
+                // 同步之后，检查是否至少有一个账户，如果不是，则跳转到添加账户页面
+                this.validateAtLeastOneEmail(accounts);
+            })
+            .catch(e => {
+                console.log(e);
+                if (e && e.response && e.response.data && e.response.data.message)
+                    message.error(e.response.data.message);
+                else
+                    message.error(e.message);
+            });
+    };
+
+    validateAtLeastOneEmail = (accounts) => {
+        // 检查是否至少有一个账户，如果不是，则跳转到添加账户页面
+        if (accounts.length === 0) {
+            message.warning("请至少添加一个通知账户");
+            this.props.history.push('/editaccount');
+        }
+    };
 
     handleSubmit = e => {
         e.preventDefault();
@@ -64,6 +93,14 @@ class EditJob extends React.Component {
 
     render() {
         const { getFieldDecorator } = this.props.form;
+
+        // 填充 email 选择框内容
+        let emailOptions = [];
+        if (this.state.emails) {
+            this.state.emails.forEach(email => {
+                emailOptions.push(<Option key={email}>{email}</Option>);
+            });
+        }
 
         return (
             <Form onSubmit={this.handleSubmit}>
@@ -135,6 +172,17 @@ class EditJob extends React.Component {
                         <Option value="utf8">utf8</Option>
                         <Option value="gbk">gbk</Option>
                     </Select>)}
+                </Form.Item>
+                <Form.Item label="通知账户">
+                    {getFieldDecorator('email', {
+                        rules: [
+                            {
+                                required: true,
+                                message: '请选择通知账户 Email',
+                            },
+                        ],
+                        initialValue: this.state.isEdit? this.state.job.email : '',
+                    })(<Select onFocus={this.getAllAccounts}>{emailOptions}</Select>)}
                 </Form.Item>
                 <Form.Item label="邮件内容">
                     {getFieldDecorator('content', {
