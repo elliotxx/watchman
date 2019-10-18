@@ -20,6 +20,12 @@ class Job extends React.Component {
             title: '任务名称',
             dataIndex: 'name',
             key: 'name',
+            width: '25%',
+            render: (text) => (
+                <div style={{ wordWrap: 'break-word', wordBreak: 'break-all' }}>
+                    {text}
+                </div>
+            ),
         },
         {
             title: '定时配置',

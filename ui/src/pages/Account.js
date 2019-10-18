@@ -15,6 +15,12 @@ class Account extends React.Component {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
+            width: '40%',
+            render: (text) => (
+                <div style={{ wordWrap: 'break-word', wordBreak: 'break-all' }}>
+                    {text}
+                </div>
+            ),
         },
         {
             title: '密码 / 授权码',
