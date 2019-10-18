@@ -23,15 +23,13 @@ type Job struct {
 
 type Account struct {
 	gorm.Model
-	Email    string `json:"name" gorm:"not null;unique"` 		// 邮箱
-	Password string `json:"password" gorm:"not null"`    		// 邮箱密码 / 授权码
+	Email    string `json:"email" gorm:"not null;unique"` // 邮箱
+	Password string `json:"password" gorm:"not null"`     // 邮箱密码 / 授权码
 }
-
-
 
 // JobFunc 定义
 type JobFunc struct {
-	Job 	Job 	// 包含定时任务运行的必要信息，比如抓取目标 URL，匹配规则等
+	Job Job // 包含定时任务运行的必要信息，比如抓取目标 URL，匹配规则等
 }
 
 func (j JobFunc) Run() {

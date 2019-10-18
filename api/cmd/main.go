@@ -55,7 +55,7 @@ func main() {
 	defer api.DB.Close()
 	// 自动迁移模式将保持更新到最新
 	// 自动迁移仅仅会创建表，缺少列和索引，并且不会改变现有列的类型或删除未使用的列以保护数据
-	api.DB.AutoMigrate(&api.Job{})
+	api.DB.AutoMigrate(&api.Job{}, &api.Account{})
 
 	// 创建&开始 cron 实例
 	api.Cron = cron.New()
@@ -83,6 +83,11 @@ func main() {
 	r.DELETE("/api/v1/job", api.DeleteJob)
 	r.PUT("/api/v1/job", api.UpdateJob)
 	r.GET("/api/v1/job", api.ListJob)
+
+	r.POST("/api/v1/account", api.AddAccount)
+	r.DELETE("/api/v1/account", api.DeleteAccount)
+	r.PUT("/api/v1/account", api.UpdateAccount)
+	r.GET("/api/v1/account", api.ListAccount)
 
 	// 让服务跑起来，默认监听 0.0.0.0:8080，也可以通过环境变量 GIN_PORT 指定
 	port := os.Getenv("GIN_PORT")

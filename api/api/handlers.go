@@ -212,3 +212,136 @@ func ListJob(c *gin.Context) {
 		"data":    jobs,
 	})
 }
+
+// 接口：添加通知账户
+func AddAccount(c *gin.Context) {
+	// 从 post form 中提取参数
+	var account Account
+	if c.BindJSON(&account) != nil {
+		// 解析失败
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "JSON 解析失败",
+		})
+		return
+	}
+
+	// 写入数据库
+	err := DB.Create(&account).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "通知账户创建失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 返回 response
+	c.JSON(http.StatusOK, gin.H{
+		"message": "通知账户创建成功",
+	})
+}
+
+// 接口：删除指定通知账户
+func DeleteAccount(c *gin.Context) {
+	// 从 post form 中提取参数
+	var account Account
+	if c.BindJSON(&account) != nil {
+		// 解析失败
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "JSON 解析失败",
+		})
+		return
+	}
+	// 判断是否已经存在
+	//if !isAccountExistByEmail(account.Email) {
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+	//		"message": "指定通知账户不存在",
+	//	})
+	//	return
+	//}
+
+	// 根据通知账户Email找到该通知账户，并删除它
+	// 手动软删除: 如果模型有DeletedAt字段，它将自动获得软删除功能！ 那么在调用Delete时不会从数据库中永久删除，而是只将字段DeletedAt的值设置为当前时间。
+	// 这里手动进行 update 来软删除
+	now := time.Now()
+	err := DB.Model(&account).Updates(Account{Email: account.Email + now.String(), Model: gorm.Model{DeletedAt: &now}}).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "通知账户删除失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 返回 response
+	c.JSON(http.StatusOK, gin.H{
+		"message": "通知账户删除成功",
+	})
+}
+
+// 接口：更新通知账户
+func UpdateAccount(c *gin.Context) {
+	// 从 post form 中提取参数
+	var account Account
+	var err error
+	if c.BindJSON(&account) != nil {
+		// 解析失败
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "JSON 解析失败",
+		})
+		return
+	}
+	//// 判断是否已经存在
+	//if !isAccountExistByID(account.ID) {
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+	//		"message": "指定通知账户不存在",
+	//	})
+	//	return
+	//}
+
+	// 根据通知账户Email找到该通知账户，并更新它
+	err = DB.Where("id = ?", account.ID).Save(&account).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "通知账户更新失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 返回 response
+	c.JSON(http.StatusOK, gin.H{
+		"message": "通知账户更新成功",
+	})
+}
+
+// 接口：获取所有通知账户
+func ListAccount(c *gin.Context) {
+	// 从 url 获取参数
+	var accounts []Account
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "从 url 解析参数失败",
+		})
+		return
+	}
+	// 指定要检索的记录数
+	err = DB.Limit(limit).Find(&accounts).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "通知账户列表获取失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+	// 抹掉 password 字段
+	for i := 0; i < len(accounts); i++ {
+		accounts[i].Password = "********"
+	}
+	// 返回结果
+	c.JSON(http.StatusOK, gin.H{
+		"message": "获取通知账户列表成功",
+		"data":    accounts,
+	})
+}

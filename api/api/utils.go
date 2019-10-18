@@ -117,3 +117,14 @@ func PrintAllJobsEntryID() {
 	}
 	glog.Infof("Current all jobs: %s", result)
 }
+
+// 根据邮箱账户判断某个通知账户在数据库中是否存在
+//func isAccountExistByEmail(email string) bool {
+//	var account Account
+//	DB.Find(&account, "email = ?", email)
+//	if account == (Account{}) {
+//		return false
+//	} else {
+//		return true
+//	}
+//}
