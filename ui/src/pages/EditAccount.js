@@ -7,7 +7,6 @@ import {
     Typography,
     Icon,
 } from 'antd';
-import { InputCron } from 'antcloud-react-crons'
 import { Link } from 'react-router-dom'
 import axios from 'axios';
 import { globalConfig } from '../config'
@@ -31,7 +30,7 @@ class EditAccount extends React.Component {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                // console.log('Received values of form: ', values);
                 // 发送 post 请求到后端
                 let method = this.state.isEdit ? axios.put : axios.post;
                 if (this.state.isEdit)
@@ -41,18 +40,22 @@ class EditAccount extends React.Component {
                         console.log(res);
                         if (res.status === 200) {
                             if (this.state.isEdit)
-                                message.info('定时任务更新成功');
+                                message.info('通知账户更新成功');
                             else
-                                message.info('定时任务创建成功');
+                                message.info('通知账户创建成功');
                             this.props.history.goBack();
                         }
                     })
                     .catch( e => {
-                        console.log(e);
-                        if (e && e.response && e.response.data && e.response.data.message)
-                            message.error('[ERROR] ' + e.response.data.message);
-                        else
+                        if (e && e.response && e.response.data && e.response.data.message){
+                            if (e.response.data.reason === "UNIQUE constraint failed: accounts.email") {
+                                message.error('[ERROR] 该 Email 账户已存在');
+                            } else {
+                                message.error('[ERROR] ' + e.response.data.message);
+                            }
+                        } else {
                             message.error(e.message);
+                        }
                     });
             }
         });
@@ -78,9 +81,10 @@ class EditAccount extends React.Component {
                                 message: '请输入邮件账号 (Email)',
                             },
                         ],
+                        initialValue: this.state.isEdit? this.state.account.email : '',
                     })(
                         <Input
-                            prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />}
                             placeholder="请输入邮件账号..."
                         />,
                     )}

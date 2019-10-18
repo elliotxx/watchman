@@ -20,7 +20,7 @@ class Account extends React.Component {
             title: '密码 / 授权码',
             dataIndex: 'password',
             key: 'password',
-            render: () => ('**********'),
+            render: () => ('********'),
         },
         {
             title: '操作',
@@ -38,8 +38,20 @@ class Account extends React.Component {
         },
     ];
 
+    componentWillMount() {
+        // 同步一次 accounts 数据
+        this.syncAccounts();
+    }
+
     handleDelete = (record) => {
         // 删除按钮响应函数
+        // 删除前，判断是否满足至少有一个通知账户
+        if (this.state.accounts.length <= 1) {
+            // 不能再删除了
+            message.warning("至少应有一个通知账户");
+            return ;
+        }
+        // 删除
         axios.delete(globalConfig.rootPath + '/api/v1/account', {data: JSON.stringify(record)})
             .then( res => {
                 console.log(res);
@@ -47,7 +59,9 @@ class Account extends React.Component {
                     message.info('删除成功');
                     // 更新 state
                     let afterAccounts = this.state.accounts.filter( v => { return v.ID !== record.ID });
-                    this.setState({'accounts': afterAccounts})
+                    this.setState({'accounts': afterAccounts});
+                    // 删除之后，检查是否至少有一个账户，如果不是，则跳转到添加账户页面
+                    this.validateAtLeastOneEmail(afterAccounts);
                 }
             })
             .catch( e => {
@@ -59,13 +73,15 @@ class Account extends React.Component {
             });
     };
 
-    syncAccounts() {
+    syncAccounts = () => {
         // 同步一次 accounts 数据，并更新 state
-        axios.get(globalConfig.rootPath + '/api/v1/account')
+        return axios.get(globalConfig.rootPath + '/api/v1/account')
             .then(res => {
                 console.log(res);
                 let accounts = res.data.data;
                 this.setState({'accounts': accounts});
+                // 同步之后，检查是否至少有一个账户，如果不是，则跳转到添加账户页面
+                this.validateAtLeastOneEmail(accounts);
             })
             .catch(e => {
                 console.log(e);
@@ -74,42 +90,15 @@ class Account extends React.Component {
                 else
                     message.error(e.message);
             });
-    }
+    };
 
-    componentWillMount() {
-        // 同步一次 accounts 数据
-        this.syncAccounts();
-    }
-
-    // expandedRowRender = (record) => {
-    //     try {
-    //         const columns = [
-    //             { title: 'row', dataIndex: 'row', key: 'row', width: '10%'},
-    //             { title: 'value', dataIndex: 'value', key: 'value' },
-    //         ];
-    //         const data = [
-    //             {
-    //                 key: 0,
-    //                 row: '目标页面 URL',
-    //                 value: record.url,
-    //             },
-    //             {
-    //                 key: 1,
-    //                 row: '抓取规则',
-    //                 value: record.pattern,
-    //             },
-    //             {
-    //                 key: 2,
-    //                 row: '邮件内容',
-    //                 value: record.content,
-    //             },
-    //         ];
-    //
-    //         return <Table showHeader={false} columns={columns} dataSource={data} pagination={false} />;
-    //     } catch (e) {
-    //         message.error(e.message);
-    //     }
-    // };
+    validateAtLeastOneEmail = (accounts) => {
+        // 检查是否至少有一个账户，如果不是，则跳转到添加账户页面
+        if (accounts.length === 0) {
+            message.warning("请至少添加一个通知账户");
+            this.props.history.push('/editaccount');
+        }
+    };
 
     render() {
         return (
@@ -118,7 +107,6 @@ class Account extends React.Component {
                     bordered
                     columns={this.columns}
                     dataSource={this.state.accounts}
-                    // expandedRowRender={this.expandedRowRender}
                     pagination={false}
                 />
 

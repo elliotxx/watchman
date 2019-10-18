@@ -35,16 +35,16 @@ class App extends React.Component {
                     {/*左侧导航条*/}
                     <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
                         <Title level={4} style={{color:'white', margin:10, textAlign:'center'}}>更夫 (watchman)</Title>
-                        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-                            <Menu.Item key="1" link='/job'>
+                        <Menu theme="dark" defaultSelectedKeys={[window.location.hash]} mode="inline">
+                            <Menu.Item key="#/job" link='/job'>
                                 <Icon type="pie-chart" />
                                 <Link to='/job'>定时任务</Link>
                             </Menu.Item>
-                            <Menu.Item key="2" link='/account'>
+                            <Menu.Item key="#/account" link='/account'>
                                 <Icon type="user" />
                                 <Link to='/account'>通知账户</Link>
                             </Menu.Item>
-                            <Menu.Item key="3">
+                            <Menu.Item key="#/template">
                                 <Icon type="file" />
                                 <Link to='/template'>模板配置</Link>
                             </Menu.Item>
