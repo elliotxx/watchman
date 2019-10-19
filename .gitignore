@@ -3,3 +3,4 @@
 *.db
 *.exe
 cmd/watchman
+data/
