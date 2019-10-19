@@ -479,7 +479,7 @@ class EditJob extends React.Component {
                         <span>抓取规则
                             <Divider type="vertical" />
                             <Button type="primary" icon="book" size="small" ghost onClick={this.onShowDrawer}>正则手册</Button>
-                        </span>)} colon={false}
+                        </span>)} extra="[\s\S] 可代表任意字符，包括回车符" colon={false}
                     >
                         {getFieldDecorator('pattern', {
                             rules: [
