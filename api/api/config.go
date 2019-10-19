@@ -14,3 +14,8 @@ var Cron *cron.Cron
 
 // 爬虫配置
 var UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6"
+var Timeout = 30
+
+// 邮件发送配置
+// 主题
+var EmailSubject = "【更新提示】%s 有更新！"

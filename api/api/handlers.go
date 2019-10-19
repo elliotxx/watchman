@@ -29,10 +29,24 @@ func AddJob(c *gin.Context) {
 		return
 	}
 
+	// 写入数据库
+	err := DB.Create(&job).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "定时任务创建失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+	glog.Info(job)
+
 	// 添加定时任务到 cron 调度器
 	jobFunc := JobFunc{Job: job}
 	entryID, err := Cron.AddJob(job.Cron, jobFunc)
 	if err != nil {
+		// revert 之前的"写入数据库"操作，使用 Unscoped 永久删除记录
+		err = DB.Unscoped().Delete(&job).Error
+		// 响应体
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务在调度器中创建失败",
 			"reason":  err.Error(),
@@ -43,17 +57,6 @@ func AddJob(c *gin.Context) {
 
 	// 输出当前调度器中的所有定时任务
 	PrintAllJobsEntryID()
-
-	// 写入数据库
-	err = DB.Create(&job).Error
-	if err != nil {
-		Cron.Remove(cron.EntryID(job.EntryID))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "定时任务创建失败",
-			"reason":  err.Error(),
-		})
-		return
-	}
 
 	// 返回 response
 	c.JSON(http.StatusOK, gin.H{
