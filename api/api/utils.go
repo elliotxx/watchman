@@ -2,6 +2,7 @@ package api
 
 import (
 	"bufio"
+	"crypto/tls"
 	"fmt"
 	"github.com/golang/glog"
 	"golang.org/x/net/html/charset"
@@ -30,6 +31,9 @@ func WatchJob(job Job) error {
 	// 生成client客户端
 	client := &http.Client{
 		Timeout: time.Duration(Timeout) * time.Second,
+		Transport: &http.Transport{ // 解决x509: certificate signed by unknown authority
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // client 将不再对服务端的证书进行校验
+		},
 	}
 	// 生成Request对象
 	req, err := http.NewRequest("GET", job.Url, nil)
@@ -147,6 +151,7 @@ func SendMail(account Account, mailTo []string, subject string, body string) err
 
 	// 发送邮件
 	d := gomail.NewDialer(host, port, account.Email, account.Password)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	err = d.DialAndSend(m)
 
 	return err
