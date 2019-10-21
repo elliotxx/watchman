@@ -34,9 +34,15 @@ RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static
 # 运行层
 FROM alpine:3.7 AS run
 
+# gin webserver 环境变量
 ENV GIN_MODE="release"
 ENV GIN_PORT=8080
+# glog 日志文件默认存放在 $TMPDIR 中
 ENV TMPDIR="/data"
+# 容器中支持中文
+ENV LC_ALL=zh_CN.utf8
+ENV LANG=zh_CN.utf8
+ENV LANGUAGE=zh_CN.utf8
 
 # 安装必要工具，设置 alpine 的镜像地址为阿里云的地址
 RUN echo "https://mirrors.aliyun.com/alpine/v3.6/main/" > /etc/apk/repositories \
