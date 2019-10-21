@@ -40,9 +40,7 @@ ENV GIN_PORT=8080
 # glog 日志文件默认存放在 $TMPDIR 中
 ENV TMPDIR="/data"
 # 容器中支持中文
-ENV LC_ALL=zh_CN.utf8
-ENV LANG=zh_CN.utf8
-ENV LANGUAGE=zh_CN.utf8
+ENV LANG=C.UTF-8
 
 # 安装必要工具，设置 alpine 的镜像地址为阿里云的地址
 RUN echo "https://mirrors.aliyun.com/alpine/v3.6/main/" > /etc/apk/repositories \
