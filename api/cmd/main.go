@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
@@ -46,6 +47,11 @@ func syncJobsFromDB() error {
 
 func main() {
 	// 初始化阶段
+	// 初始化日志库
+	flag.Parse()
+	// Flush守护进程会间隔30s周期性地flush缓冲区中的log
+	defer glog.Flush()
+
 	// 连接 sqlite3 数据库
 	var err error
 	api.DB, err = gorm.Open("sqlite3", "watchman.db")

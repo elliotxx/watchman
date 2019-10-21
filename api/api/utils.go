@@ -19,6 +19,9 @@ import (
 // 定时任务通用 Job
 func WatchJob(job Job) error {
 	// 功能：爬取目标页面指定内容，和数据库中对比，如果不一样，就发送邮件通知，如果一样，就什么也不做
+	// 定时任务结束时，输出缓冲区的日志
+	defer glog.Flush()
+
 	var oldValue, newValue string
 	infoPrefix := "[Job#%d][%s] "
 
