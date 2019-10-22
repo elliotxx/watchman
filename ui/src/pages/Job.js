@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, message, Radio, Tag, Badge } from 'antd';
+import { Table, Button, message, Radio, Tag, Badge, Popconfirm } from 'antd';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { globalConfig } from '../config'
@@ -58,7 +58,14 @@ class Job extends React.Component {
                             <Radio.Button>编辑</Radio.Button>
                         </Link>
                         <Radio.Button onClick={ () => {this.handleSwitch(record)} }>{ record.status === 0 ? '暂停' : '开始' }</Radio.Button>
-                        <Radio.Button onClick={ () => {this.handleDelete(record)} }>删除</Radio.Button>
+                        <Popconfirm
+                            title="真的要删掉我吗？"
+                            onConfirm={ () => {this.handleDelete(record)} }
+                            okText="是"
+                            cancelText="否"
+                        >
+                            <Radio.Button>删除</Radio.Button>
+                        </Popconfirm>
                     </Radio.Group>
                     {/*<Link to={{pathname: '/editjob', state: {job: record}}}>*/}
                         {/*<Button type="primary" ghost>编辑</Button>*/}

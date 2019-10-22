@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, message, Radio } from 'antd';
+import { Table, Button, message, Radio, Popconfirm } from 'antd';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { globalConfig } from '../config'
@@ -37,7 +37,14 @@ class Account extends React.Component {
                         <Link to={{pathname: '/editaccount', state: {account: record}}}>
                             <Radio.Button>编辑</Radio.Button>
                         </Link>
-                        <Radio.Button onClick={ () => {this.handleDelete(record)} }>删除</Radio.Button>
+                        <Popconfirm
+                            title="真的要删掉我吗？"
+                            onConfirm={ () => {this.handleDelete(record)} }
+                            okText="是"
+                            cancelText="否"
+                        >
+                            <Radio.Button>删除</Radio.Button>
+                        </Popconfirm>
                     </Radio.Group>
                 </span>
             ),
