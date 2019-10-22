@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"github.com/jinzhu/gorm"
@@ -346,5 +347,46 @@ func ListAccount(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "获取通知账户列表成功",
 		"data":    accounts,
+	})
+}
+
+// 接口：测试正则表达式匹配效果
+func TestPattern(c *gin.Context) {
+	// 获取参数
+	var result string
+	var err error
+	patternType := c.DefaultQuery("type", "re")
+	url := c.Query("url")
+	pattern := c.Query("pattern")
+
+	// 根据 url 获取 html 源码
+	html, err := GetHtmlByUrl(url)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "获取 html 源码失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 根据 pattern 对 html 源码进行匹配
+	switch patternType {
+	case "re":
+		result, err = MatchTargetByRE(html, pattern)
+	default:
+		err = fmt.Errorf("Pattern type `%s` not found", patternType)
+	}
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "抓取规则无效",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 返回结果
+	c.JSON(http.StatusOK, gin.H{
+		"message": "pattern 匹配到内容",
+		"data":    result,
 	})
 }

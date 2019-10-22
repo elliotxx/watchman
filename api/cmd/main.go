@@ -95,6 +95,8 @@ func main() {
 	r.PUT("/api/v1/account", api.UpdateAccount)
 	r.GET("/api/v1/account", api.ListAccount)
 
+	r.GET("/api/v1/testpattern", api.TestPattern)
+
 	// 让服务跑起来，默认监听 0.0.0.0:8080，也可以通过环境变量 GIN_PORT 指定
 	port := os.Getenv("GIN_PORT")
 	if port == "" {
