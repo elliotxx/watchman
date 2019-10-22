@@ -119,9 +119,28 @@ class EditJob extends React.Component {
         }
 
         let markdown = `
-> ref: https://www.cnblogs.com/golove/p/3269099.html
+## 示例
 
-用法：
+### 匹配页面标题：  
+\`\`\`
+<title>(.*?)</title>
+\`\`\`  
+注意：() 中代表要匹配的目标；
+
+### 匹配起点某小说的最新章节：
+\`\`\`  
+<a class="blue" href=".*?" data-eid="qd_G19" data-cid=".*?" title=".*?" target="_blank">(.*?)</a><i>.*?</i><em class="time">.*?</em>
+\`\`\`  
+注意：. 代表任意字符，不包括回车符；.*? 代表任意长度（* 代表 0~N 个字符）的字符串；
+
+### 匹配忽略任意字符（包括回车符）：  
+\`\`\`  
+<div class="lb-z-r-content" id="listChangeDiv">.*?class='lb-z-r-content-b'>[\\s\\S]*?<a href=.*?title='(.*?)'>  
+\`\`\`  
+注意：[\\s\\S] 代表任意字符，包括回车符；[\\s\\S]*? 代表任意长度（* 代表 0~N 个字符）的字符串；
+
+## 用法
+> ref: https://www.cnblogs.com/golove/p/3269099.html
 
 ------------------------------
 
