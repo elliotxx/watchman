@@ -14,7 +14,6 @@ type Job struct {
 	Cron     string `json:"cron"`                               // 定时配置
 	Url      string `json:"url" gorm:"type:varchar(1000)"`      // 目标页面 URL
 	Pattern  string `json:"pattern" gorm:"type:varchar(2000)"`  // 抓取规则
-	Charset  string `json:"charset" gorm:"type:varchar(100)"`   // 目标页面编码
 	Email    string `json:"email" gorm:"not null"`              // 通知账户
 	Content  string `json:"content" gorm:"type:varchar(2000)"`  // 邮件内容
 	Status   int    `json:"status"`                             // 运行状态, 0代表“运行中”、1代表“暂停”

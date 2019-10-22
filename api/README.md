@@ -21,18 +21,6 @@ docker run -d -p 8083:8080 watchman-api
 ```
 浏览器访问 ```127.0.0.1:8083/job``` 查看效果
 
-## 数据表设计
-定时任务
-```
-name    string  // 任务名称
-cron    string  // 定时配置
-url     string  // 目标页面 URL
-pattern string  // 抓取规则
-charset string  // 目标页面编码
-content string  // 邮件内容
-status  int     // 运行状态, 0代表“运行中”、1代表“暂停”
-```
-
 ## 笔记
 golang 项目创建
 ```
