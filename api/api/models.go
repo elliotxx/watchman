@@ -33,9 +33,16 @@ type JobFunc struct {
 }
 
 func (j JobFunc) Run() {
-	// 定时任务到时间时会运行 Run()
+	// 定时任务通过 Run() 来执行
+	infoPrefix := "[Job#%d][%s] "
+
+	// 任务执行前后的提示信息
+	glog.Infof("[Job#%d][%s][%s][Status:%d][EntryID:%d][%s] Start.", j.Job.ID, j.Job.Name, j.Job.Cron, j.Job.Status, j.Job.EntryID, j.Job.OldValue)
+	defer glog.Infof("[Job#%d][%s][%s][Status:%d][EntryID:%d][%s] End.", j.Job.ID, j.Job.Name, j.Job.Cron, j.Job.Status, j.Job.EntryID, j.Job.OldValue)
+
+	// 执行定时任务
 	err := WatchJob(j.Job)
 	if err != nil {
-		glog.Error(err.Error())
+		glog.Errorf(infoPrefix+err.Error(), j.Job.ID, j.Job.Name)
 	}
 }

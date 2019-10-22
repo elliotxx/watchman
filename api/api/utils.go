@@ -23,11 +23,7 @@ func WatchJob(job Job) error {
 	defer glog.Flush()
 
 	var oldValue, newValue string
-	infoPrefix := "[Job#%d][%s] "
-
-	// 任务执行前后的提示信息
-	glog.Infof("[Job#%d][%s][%s][Status:%d][EntryID:%d][%s] Start.", job.ID, job.Name, job.Cron, job.Status, job.EntryID, job.OldValue)
-	defer glog.Infof("[Job#%d][%s][%s][Status:%d][EntryID:%d][%s] End.", job.ID, job.Name, job.Cron, job.Status, job.EntryID, job.OldValue)
+	var infoPrefix = "[Job#%d][%s] "
 
 	// 爬取目标页面 html
 	glog.Infof(infoPrefix+"Crawling target page...", job.ID, job.Name)
@@ -61,16 +57,12 @@ func WatchJob(job Job) error {
 
 	// 匹配指定内容（获取新值）
 	glog.Infof(infoPrefix+"Matching target item...", job.ID, job.Name)
-	r, _ := regexp.Compile(job.Pattern)
-	// 在 b 中查找 re 中编译好的正则表达式，并返回第一个匹配的内容
-	result := r.FindSubmatch(html)
-	if len(result) >= 2 {
-		newValue = string(result[1])
-		glog.Infof(infoPrefix+"Match to target as new value: '%s'", job.ID, job.Name, newValue)
-	} else {
-		glog.Infof(infoPrefix+"Don`t match target", job.ID, job.Name)
-		return fmt.Errorf("Don`t match target")
+	// 根据正则表达式 pattern 找到 html 中的对应内容
+	newValue, err = MatchTargetByRE(html, job.Pattern)
+	if err != nil {
+		return err
 	}
+	glog.Infof(infoPrefix+"Match to target as new value: '%s'", job.ID, job.Name, newValue)
 
 	// 从数据库中取出当前旧值
 	glog.Infof(infoPrefix+"Getting old value from Database...", job.ID, job.Name)
@@ -117,6 +109,19 @@ func WatchJob(job Job) error {
 		}
 	}
 	return nil
+}
+
+func MatchTargetByRE(content []byte, pattern string) (string, error) {
+	// 根据正则表达式 pattern，匹配 content 中的目标内容
+	r, _ := regexp.Compile(pattern)
+	// 在 content 中查找 re 中编译好的正则表达式，并返回第一个匹配的内容
+	items := r.FindSubmatch(content)
+	if len(items) >= 2 {
+		result := string(items[1])
+		return result, nil
+	} else {
+		return "", fmt.Errorf("Don`t match target")
+	}
 }
 
 func DetermineEncoding(r io.Reader) ([]byte, error) {
