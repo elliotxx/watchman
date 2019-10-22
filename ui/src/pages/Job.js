@@ -133,7 +133,7 @@ class Job extends React.Component {
             });
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         // 同步一次 jobs 数据
         this.syncJobs();
     }

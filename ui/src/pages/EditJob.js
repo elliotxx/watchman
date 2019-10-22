@@ -32,10 +32,8 @@ class EditJob extends React.Component {
             testPatternStatus: "play-circle"        // pattern 测试的状态，play-circle 代表测试前，loading 代表测试中，check-circle 代表测试成功，close-circle 代表测试失败
         };
         if (props.location.state && props.location.state.job) {
-            this.state = {
-                isEdit: true,
-                job: props.location.state.job,
-            };
+            this.state.isEdit = true;
+            this.state.job = props.location.state.job;
         }
     }
     getAllAccounts = () => {
@@ -144,7 +142,6 @@ class EditJob extends React.Component {
 
     render() {
         const { getFieldDecorator } = this.props.form;
-        console.log(this.state);
 
         // 填充 email 选择框内容
         let emailOptions = [];

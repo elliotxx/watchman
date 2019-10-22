@@ -20,10 +20,8 @@ class EditAccount extends React.Component {
             isEdit: false,  // 是否为编辑模式
         };
         if (props.location.state && props.location.state.account) {
-            this.state = {
-                isEdit: true,
-                account: props.location.state.account,
-            };
+            this.state.isEdit = true;
+            this.state.account = props.location.state.account;
         }
     }
 

@@ -51,7 +51,7 @@ class Account extends React.Component {
         },
     ];
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         // 同步一次 accounts 数据
         this.syncAccounts();
     }
