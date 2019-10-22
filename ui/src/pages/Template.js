@@ -15,18 +15,13 @@ const columns = [
         key: 'cron',
     },
     {
-        title: '目标页面编码',
-        dataIndex: 'charset',
-        key: 'charset',
-    },
-    {
         title: '操作',
         key: 'action',
-        render: (text, record) => (
+        render: () => (
             <span>
-                <a href='/template'>编辑</a>
+                <a href='#/template'>编辑</a>
                 <Divider type="vertical" />
-                <a href='/template'>删除</a>
+                <a href='#/template'>删除</a>
             </span>
         ),
     },
@@ -38,7 +33,6 @@ const data = [
         name: '起点小说模板',
         cron: "*/10 * * * *",
         pattern: `<a class="blue" href=".*?" data-eid="qd_G19" data-cid=".*?" title=".*?" target="_blank">(.*?)</a><i>.*?</i><em class="time">.*?</em>`,
-        charset: "utf8",
         content: "请访问 https://www.owllook.net/chapter?url=https://www.qu.la/book/3353/                                                             &novels_name=%E5%87%A1%E4%BA%BA%E4%BF%AE%E4%BB%99%E4%BC%A0%E4%BB%99%E7%95%8C%E7%AF%87 查看小说",
     },
     {
@@ -46,7 +40,6 @@ const data = [
         name: '笔趣阁小说模板',
         cron: "*/10 * * * *",
         pattern: `<a class="blue" href=".*?" data-eid="qd_G19" data-cid=".*?" title=".*?" target="_blank">(.*?)</a><i>.*?</i><em class="time">.*?</em>`,
-        charset: "gbk",
         content: "请访问 https://www.owllook.net/chapter?url=https://www.qu.la/book/3353/                                                             &novels_name=%E5%87%A1%E4%BA%BA%E4%BF%AE%E4%BB%99%E4%BC%A0%E4%BB%99%E7%95%8C%E7%AF%87 查看小说",
     },
 ];

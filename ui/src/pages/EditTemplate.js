@@ -2,18 +2,16 @@ import React from 'react';
 import {
     Form,
     Input,
-    Select,
     Button,
 } from 'antd';
 import { InputCron } from 'antcloud-react-crons'
 import { Link } from 'react-router-dom'
 
-const { Option } = Select;
 const { TextArea } = Input;
 
 class EditTemplate extends React.Component {
-    state = {
-    };
+    // state = {
+    // };
 
     handleSubmit = e => {
         e.preventDefault();
@@ -62,19 +60,6 @@ class EditTemplate extends React.Component {
                             },
                         ],
                     })(<Input />)}
-                </Form.Item>
-                <Form.Item label="目标页面编码">
-                    {getFieldDecorator('charset', {
-                        rules: [
-                            {
-                                required: true,
-                                message: '请选择目标页面编码',
-                            },
-                        ],
-                    })(<Select>
-                        <Option value="utf8">utf8</Option>
-                        <Option value="gbk">gbk</Option>
-                    </Select>)}
                 </Form.Item>
                 <Form.Item label="邮件内容">
                     {getFieldDecorator('content', {

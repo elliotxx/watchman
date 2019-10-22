@@ -33,11 +33,6 @@ class Job extends React.Component {
             key: 'cron',
         },
         {
-            title: '目标页面编码',
-            dataIndex: 'charset',
-            key: 'charset',
-        },
-        {
             title: '状态',
             dataIndex: 'status',
             key: 'status',

@@ -514,20 +514,6 @@ class EditJob extends React.Component {
                             initialValue: this.state.isEdit? this.state.job.pattern : '',
                         })(<TextArea rows={4} />)}
                     </Form.Item>
-                    <Form.Item label="目标页面编码">
-                        {getFieldDecorator('charset', {
-                            rules: [
-                                {
-                                    required: true,
-                                    message: '请选择目标页面编码',
-                                },
-                            ],
-                            initialValue: this.state.isEdit? this.state.job.charset : '',
-                        })(<Select>
-                            <Option value="utf8">utf8</Option>
-                            <Option value="gbk">gbk</Option>
-                        </Select>)}
-                    </Form.Item>
                     <Form.Item label="通知账户">
                         {getFieldDecorator('email', {
                             rules: [
