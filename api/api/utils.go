@@ -27,30 +27,7 @@ func WatchJob(job Job) error {
 
 	// 爬取目标页面 html
 	glog.Infof(infoPrefix+"Crawling target page...", job.ID, job.Name)
-	// 生成client客户端
-	client := &http.Client{
-		Timeout: time.Duration(Timeout) * time.Second,
-		Transport: &http.Transport{ // 解决x509: certificate signed by unknown authority
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // client 将不再对服务端的证书进行校验
-		},
-	}
-	// 生成Request对象
-	req, err := http.NewRequest("GET", job.Url, nil)
-	if err != nil {
-		return err
-	}
-	// 添加Header
-	req.Header.Add("User-Agent", UserAgent)
-	// 发起请求
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	// 最后关闭响应体
-	defer resp.Body.Close()
-
-	// 读取响应体，自动匹配编码
-	html, err := DetermineEncoding(resp.Body)
+	html, err := GetHtmlByUrl(job.Url)
 	if err != nil {
 		return err
 	}
@@ -109,6 +86,38 @@ func WatchJob(job Job) error {
 		}
 	}
 	return nil
+}
+
+func GetHtmlByUrl(url string) ([]byte, error) {
+	// 抓取指定 url 的 html 页面源码，可自动适配页面编码
+	// 生成client客户端
+	client := &http.Client{
+		Timeout: time.Duration(Timeout) * time.Second,
+		Transport: &http.Transport{ // 解决x509: certificate signed by unknown authority
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // client 将不再对服务端的证书进行校验
+		},
+	}
+	// 生成Request对象
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return []byte{}, err
+	}
+	// 添加Header
+	req.Header.Add("User-Agent", UserAgent)
+	// 发起请求
+	resp, err := client.Do(req)
+	if err != nil {
+		return []byte{}, err
+	}
+	// 最后关闭响应体
+	defer resp.Body.Close()
+
+	// 读取响应体，自动适配编码
+	html, err := DetermineEncoding(resp.Body)
+	if err != nil {
+		return []byte{}, err
+	}
+	return html, nil
 }
 
 func MatchTargetByRE(content []byte, pattern string) (string, error) {
