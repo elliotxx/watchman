@@ -69,7 +69,7 @@ class Account extends React.Component {
             .then( res => {
                 console.log(res);
                 if (res.status === 200) {
-                    message.info('删除成功');
+                    message.success('删除成功');
                     // 更新 state
                     let afterAccounts = this.state.accounts.filter( v => { return v.ID !== record.ID });
                     this.setState({'accounts': afterAccounts});
@@ -80,7 +80,7 @@ class Account extends React.Component {
             .catch( e => {
                 console.log(e);
                 if (e && e.response && e.response.data && e.response.data.message)
-                    message.error('[ERROR] ' + e.response.data.message);
+                    message.error(e.response.data.message);
                 else
                     message.error(e.message);
             });
@@ -117,10 +117,11 @@ class Account extends React.Component {
         return (
             <div>
                 <Table
-                    bordered
+                    rowKey="ID"
                     columns={this.columns}
                     dataSource={this.state.accounts}
                     pagination={false}
+                    bordered
                 />
 
                 <Link to='/editaccount'>

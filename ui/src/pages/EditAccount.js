@@ -12,17 +12,18 @@ import axios from 'axios';
 import { globalConfig } from '../config'
 
 class EditAccount extends React.Component {
-    state = {
-        isEdit: false,  // 编辑模式
-    };
-
     constructor(props) {
         super(props);
+
+        // 初始化 state
+        this.state = {
+            isEdit: false,  // 是否为编辑模式
+        };
         if (props.location.state && props.location.state.account) {
             this.state = {
                 isEdit: true,
                 account: props.location.state.account,
-            }
+            };
         }
     }
 
@@ -40,18 +41,18 @@ class EditAccount extends React.Component {
                         console.log(res);
                         if (res.status === 200) {
                             if (this.state.isEdit)
-                                message.info('通知账户更新成功');
+                                message.success('通知账户更新成功');
                             else
-                                message.info('通知账户创建成功');
+                                message.success('通知账户创建成功');
                             this.props.history.goBack();
                         }
                     })
                     .catch( e => {
                         if (e && e.response && e.response.data && e.response.data.message){
                             if (e.response.data.reason === "UNIQUE constraint failed: accounts.email") {
-                                message.error('[ERROR] 该 Email 账户已存在');
+                                message.error('该 Email 账户已存在');
                             } else {
-                                message.error('[ERROR] ' + e.response.data.message);
+                                message.error(e.response.data.message);
                             }
                         } else {
                             message.error(e.message);

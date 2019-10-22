@@ -20,20 +20,22 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 class EditJob extends React.Component {
-    state = {
-        isEdit: false,              // 编辑模式
-        isVisibleDrawer: false,     // 正则手册的抽屉是否可见
-        emails: [],                 // 已经添加的 emails 们
-    };
-
     constructor(props) {
         super(props);
         this.getAllAccounts();
+
+        // 初始化 state
+        this.state = {
+            isEdit: false,              // 是否为编辑模式
+            isVisibleDrawer: false,     // 正则手册的抽屉是否可见
+            emails: [],                 // 已经添加的 emails 们
+            testPatternStatus: "play-circle"        // pattern 测试的状态，play-circle 代表测试前，loading 代表测试中，check-circle 代表测试成功，close-circle 代表测试失败
+        };
         if (props.location.state && props.location.state.job) {
             this.state = {
                 isEdit: true,
                 job: props.location.state.job,
-            }
+            };
         }
     }
     getAllAccounts = () => {
@@ -64,6 +66,39 @@ class EditJob extends React.Component {
         }
     };
 
+    testPattern = () => {
+        // 测试当前抓取规则 pattern 的效果
+        const { getFieldValue } = this.props.form;
+
+        this.setState({"testPatternStatus" : "loading"});
+        let params = {
+            params: {
+                url : getFieldValue("url"),
+                type: "re",
+                pattern: getFieldValue("pattern"),
+            }
+        };
+        console.log(params);
+        // 发送 get 请求到后端
+        axios.get(globalConfig.rootPath + '/api/v1/testpattern', params)
+            .then(res => {
+                this.setState({"testPatternStatus" : "check-circle"});
+                if (res && res.data && res.data.data) {
+                    message.success("匹配结果 => " + res.data.data);
+                } else {
+                    message.error("抓取规则无效");
+                }
+            })
+            .catch( e => {
+                this.setState({"testPatternStatus" : "close-circle"});
+                console.log(e);
+                if (e && e.response && e.response.data && e.response.data.message)
+                    message.error(e.response.data.message);
+                else
+                    message.error(e.message);
+            });
+    };
+
     handleSubmit = e => {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
@@ -78,16 +113,16 @@ class EditJob extends React.Component {
                         console.log(res);
                         if (res.status === 200) {
                             if (this.state.isEdit)
-                                message.info('定时任务更新成功');
+                                message.success('定时任务更新成功');
                             else
-                                message.info('定时任务创建成功');
+                                message.success('定时任务创建成功');
                             this.props.history.goBack();
                         }
                     })
                     .catch( e => {
                         console.log(e);
                         if (e && e.response && e.response.data && e.response.data.message)
-                            message.error('[ERROR] ' + e.response.data.message);
+                            message.error(e.response.data.message);
                         else
                             message.error(e.message);
                     });
@@ -109,6 +144,7 @@ class EditJob extends React.Component {
 
     render() {
         const { getFieldDecorator } = this.props.form;
+        console.log(this.state);
 
         // 填充 email 选择框内容
         let emailOptions = [];
@@ -497,8 +533,27 @@ class EditJob extends React.Component {
                     <Form.Item label={(
                         <span>抓取规则
                             <Divider type="vertical" />
-                            <Button type="primary" icon="book" size="small" ghost onClick={this.onShowDrawer}>正则手册</Button>
-                        </span>)} extra="[\s\S] 可代表任意字符，包括回车符" colon={false}
+                            <Button
+                                type="primary"
+                                size="small"
+                                icon="book"
+                                onClick={this.onShowDrawer}
+                                ghost
+                            >
+                                正则手册
+                            </Button>
+                            <Divider type="vertical" />
+                            <Button
+                                type="primary"
+                                size="small"
+                                icon={this.state.testPatternStatus}
+                                onClick={this.testPattern}
+                                ghost
+                            >
+                                测试
+                            </Button>
+                        </span>
+                    )} extra="[\s\S] 可代表任意字符，包括回车符" colon={false}
                     >
                         {getFieldDecorator('pattern', {
                             rules: [
