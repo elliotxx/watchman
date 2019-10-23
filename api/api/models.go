@@ -46,3 +46,39 @@ func (j JobFunc) Run() {
 		glog.Errorf(infoPrefix+err.Error(), j.Job.ID, j.Job.Name)
 	}
 }
+
+// 邮箱后缀对应的 host 和 port 映射表
+var Suffix2host = map[string]string{
+	"qq.com":       "smtp.qq.com",
+	"163.com":      "smtp.163.com",
+	"126.com":      "smtp.126.com",
+	"139.com":      "smtp.139.com",
+	"gmail.com":    "smtp.gmail.com",
+	"foxmail.com":  "smtp.foxmail.com",
+	"sina.com.cn":  "smtp.sina.com.cn",
+	"sohu.com":     "smtp.sohu.com",
+	"yahoo.com.cn": "smtp.mail.yahoo.com.cn",
+	"live.com":     "smtp.live.com",
+	"263.net":      "smtp.263.net",
+	"263.net.cn":   "smtp.263.net.cn",
+	"x263.net":     "smtp.263.net",
+	"china.com":    "smtp.china.com",
+	"tom.com":      "smtp.tom.com",
+}
+var Suffix2port = map[string]int{
+	"qq.com":       465,
+	"163.com":      465,
+	"126.com":      465,
+	"139.com":      465,
+	"gmail.com":    587,
+	"foxmail.com":  465,
+	"sina.com.cn":  25,
+	"sohu.com":     25,
+	"yahoo.com.cn": 587,
+	"live.com":     587,
+	"263.net":      25,
+	"263.net.cn":   25,
+	"x263.net":     25,
+	"china.com":    25,
+	"tom.com":      25,
+}

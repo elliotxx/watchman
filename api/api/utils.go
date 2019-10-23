@@ -175,14 +175,6 @@ func SendMail(account Account, mailTo []string, subject string, body string) err
 }
 
 func ParseEmailHostport(email string) (string, int, error) {
-	// 邮箱后缀对应的 host 和 port 映射表
-	suffix2host := map[string]string{
-		"qq.com": "smtp.qq.com",
-	}
-	suffix2port := map[string]int{
-		"qq.com": 465,
-	}
-
 	// 获取 email 后缀，比如 xxx@qq.com，后缀为 qq.com
 	result := strings.Split(email, "@")
 	if len(result) <= 1 {
@@ -191,8 +183,8 @@ func ParseEmailHostport(email string) (string, int, error) {
 	suffix := result[len(result)-1]
 
 	// 根据 email 后缀获取 host 和 port
-	host, ok1 := suffix2host[suffix]
-	port, ok2 := suffix2port[suffix]
+	host, ok1 := Suffix2host[suffix]
+	port, ok2 := Suffix2port[suffix]
 	if ok1 && ok2 {
 		return host, port, nil
 	} else {
