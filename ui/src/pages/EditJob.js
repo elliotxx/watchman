@@ -76,7 +76,6 @@ class EditJob extends React.Component {
                 pattern: getFieldValue("pattern"),
             }
         };
-        console.log(params);
         // 发送 get 请求到后端
         axios.get(globalConfig.rootPath + '/api/v1/testpattern', params)
             .then(res => {

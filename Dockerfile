@@ -32,7 +32,10 @@ RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static
 
 
 # 运行层
-FROM alpine:3.7 AS run
+FROM alpine:3.7 AS production
+
+# 维护者
+MAINTAINER ElliotXX <951376975@qq.com>
 
 # gin webserver 环境变量
 ENV GIN_MODE="release"
