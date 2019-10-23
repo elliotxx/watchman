@@ -200,6 +200,23 @@ func ParseEmailHostport(email string) (string, int, error) {
 	}
 }
 
+func IsConnectedEmail(account Account) error {
+	// 测试该 Email 账户是否连通
+	// 解析 Email 的主机和端口号
+	host, port, err := ParseEmailHostport(account.Email)
+	if err != nil {
+		return err
+	}
+	// 拨号并向 SMTP 服务器进行身份验证
+	d := gomail.NewDialer(host, port, account.Email, account.Password)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	_, err = d.Dial()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // 根据任务名称判断某个定时任务在数据库中是否存在
 func isJobExistByName(name string) bool {
 	var job Job

@@ -350,7 +350,7 @@ func ListAccount(c *gin.Context) {
 	})
 }
 
-// 接口：测试正则表达式匹配效果
+// 接口：测试正则表达式匹配效果，返回匹配结果或者报错信息
 func TestPattern(c *gin.Context) {
 	// 获取参数
 	var result string
@@ -388,5 +388,68 @@ func TestPattern(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pattern 匹配到内容",
 		"data":    result,
+	})
+}
+
+// 接口：测试邮箱账号是否可以发送邮件
+func TestEmail(c *gin.Context) {
+	// 获取参数
+	var account Account
+	var err error
+	email := c.Query("email")
+	// 如果没请求密码参数，就从数据库中取出密码
+	password := c.Query("password")
+	// 参数校验
+	if email == "" {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Email 参数不能为空",
+			"reason":  "",
+		})
+		return
+	}
+
+	// 判断密码是否为空
+	if password == "" {
+		// 空密码，表示请求参数里没有填写密码信息，那么就从数据库中取出该 email 对应的密码
+		err = DB.Where("email = ?", email).First(&account).Error
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": "该 Email 账户不存在",
+				"reason":  err.Error(),
+			})
+			return
+		}
+		password = account.Password
+	}
+
+	// 测试该账户的连通性（该 Email 账户是否能用来发送邮件）
+	err = IsConnectedEmail(Account{
+		Email:    email,
+		Password: password,
+	})
+	if err != nil {
+		switch err.Error() {
+		case "Error parsing email to suffix":
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": "无法正确解析出该 Email 账户的主机和端口号",
+				"reason":  err.Error(),
+			})
+		case "No corresponding host and port found":
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": "没有该 Email 账户匹配的主机和端口号",
+				"reason":  err.Error(),
+			})
+		default:
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": "该 Email 账户身份验证失败，无法使用",
+				"reason":  err.Error(),
+			})
+		}
+		return
+	}
+
+	// 返回结果
+	c.JSON(http.StatusOK, gin.H{
+		"message": "该 Email 账户身份验证通过，可以发送邮件",
 	})
 }
