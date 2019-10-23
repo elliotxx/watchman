@@ -6,6 +6,7 @@ import {
     message,
     Typography,
     Icon,
+    Divider,
 } from 'antd';
 import { Link } from 'react-router-dom'
 import axios from 'axios';
@@ -18,6 +19,7 @@ class EditAccount extends React.Component {
         // 初始化 state
         this.state = {
             isEdit: false,  // 是否为编辑模式
+            testEmailStatus: "play-circle"        // email 连通性测试的状态，play-circle 代表测试前，loading 代表测试中，check-circle 代表测试成功，close-circle 代表测试失败
         };
         if (props.location.state && props.location.state.account) {
             this.state.isEdit = true;
@@ -60,6 +62,33 @@ class EditAccount extends React.Component {
         });
     };
 
+    testEmail = () => {
+        // 测试当前 Email 账户的连通性，即是否能用来发送邮件
+        const { getFieldValue } = this.props.form;
+
+        this.setState({"testEmailStatus" : "loading"});
+        let params = {
+            params: {
+                email : getFieldValue("email"),
+                password: getFieldValue("password"),
+            }
+        };
+        // 发送 get 请求到后端
+        axios.get(globalConfig.rootPath + '/api/v1/testemail', params)
+            .then( () => {
+                this.setState({"testEmailStatus" : "check-circle"});
+                message.success("该 Email 账户身份验证通过，可以发送邮件");
+            })
+            .catch( e => {
+                this.setState({"testEmailStatus" : "close-circle"});
+                console.log(e);
+                if (e && e.response && e.response.data && e.response.data.message)
+                    message.error(e.response.data.message);
+                else
+                    message.error(e.message);
+            });
+    };
+
     render() {
         const { getFieldDecorator } = this.props.form;
 
@@ -88,7 +117,20 @@ class EditAccount extends React.Component {
                         />,
                     )}
                 </Form.Item>
-                <Form.Item label="密码 / 授权码">
+                <Form.Item label={(
+                    <span>密码 / 授权码
+                        <Divider type="vertical" />
+                        <Button
+                            type="primary"
+                            size="small"
+                            icon={this.state.testEmailStatus}
+                            onClick={this.testEmail}
+                            ghost
+                        >
+                            测试连通性
+                        </Button>
+                    </span>
+                )} colon={false} >
                     {getFieldDecorator('password', {
                         rules: [
                             {
