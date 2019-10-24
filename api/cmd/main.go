@@ -96,7 +96,7 @@ func main() {
 	r.GET("/api/v1/account", api.ListAccount)
 
 	r.GET("/api/v1/testpattern", api.TestPattern)
-	r.GET("/api/v1/testemail", api.TestEmail)
+	r.POST("/api/v1/testemail", api.TestEmail)
 
 	// 让服务跑起来，默认监听 0.0.0.0:8080，也可以通过环境变量 GIN_PORT 指定
 	port := os.Getenv("GIN_PORT")

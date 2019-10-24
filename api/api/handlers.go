@@ -15,10 +15,11 @@ import (
 func AddJob(c *gin.Context) {
 	// 从 post form 中提取参数
 	var job Job
-	if c.BindJSON(&job) != nil {
+	if err := c.BindJSON(&job); err != nil {
 		// 解析失败
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "JSON 解析失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -26,6 +27,7 @@ func AddJob(c *gin.Context) {
 	if isJobExistByName(job.Name) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "该任务名称已经存在",
+			"reason":  "",
 		})
 		return
 	}
@@ -69,10 +71,11 @@ func AddJob(c *gin.Context) {
 func DeleteJob(c *gin.Context) {
 	// 从 post form 中提取参数
 	var job Job
-	if c.BindJSON(&job) != nil {
+	if err := c.BindJSON(&job); err != nil {
 		// 解析失败
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "JSON 解析失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -80,6 +83,7 @@ func DeleteJob(c *gin.Context) {
 	if !isJobExistByName(job.Name) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "指定任务不存在",
+			"reason":  "",
 		})
 		return
 	}
@@ -125,10 +129,11 @@ func UpdateJob(c *gin.Context) {
 	// 从 post form 中提取参数
 	var job Job
 	var err error
-	if c.BindJSON(&job) != nil {
+	if err = c.BindJSON(&job); err != nil {
 		// 解析失败
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "JSON 解析失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -136,6 +141,7 @@ func UpdateJob(c *gin.Context) {
 	if !isJobExistByID(job.ID) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "指定任务不存在",
+			"reason":  "",
 		})
 		return
 	}
@@ -198,6 +204,7 @@ func ListJob(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "从 url 解析参数失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -221,10 +228,11 @@ func ListJob(c *gin.Context) {
 func AddAccount(c *gin.Context) {
 	// 从 post form 中提取参数
 	var account Account
-	if c.BindJSON(&account) != nil {
+	if err := c.BindJSON(&account); err != nil {
 		// 解析失败
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "JSON 解析失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -249,10 +257,11 @@ func AddAccount(c *gin.Context) {
 func DeleteAccount(c *gin.Context) {
 	// 从 post form 中提取参数
 	var account Account
-	if c.BindJSON(&account) != nil {
+	if err := c.BindJSON(&account); err != nil {
 		// 解析失败
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "JSON 解析失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -288,10 +297,11 @@ func UpdateAccount(c *gin.Context) {
 	// 从 post form 中提取参数
 	var account Account
 	var err error
-	if c.BindJSON(&account) != nil {
+	if err := c.BindJSON(&account); err != nil {
 		// 解析失败
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "JSON 解析失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -327,6 +337,7 @@ func ListAccount(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "从 url 解析参数失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
@@ -396,21 +407,22 @@ func TestEmail(c *gin.Context) {
 	// 获取参数
 	var account Account
 	var err error
-	email := c.Query("email")
-	// 如果没请求密码参数，就从数据库中取出密码
-	password := c.Query("password")
-	// 参数校验
-	if email == "" {
+	if err = c.BindJSON(&account); err != nil {
+		// 解析失败
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Email 参数不能为空",
-			"reason":  "",
+			"message": "JSON 解析失败",
+			"reason":  err.Error(),
 		})
 		return
 	}
+	email := account.Email
+	password := account.Password
 
 	// 判断密码是否为空
+	// 如果没请求密码参数，就从数据库中取出密码
 	if password == "" {
 		// 空密码，表示请求参数里没有填写密码信息，那么就从数据库中取出该 email 对应的密码
+		account = Account{}
 		err = DB.Where("email = ?", email).First(&account).Error
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -445,8 +457,12 @@ func TestEmail(c *gin.Context) {
 				"reason":  err.Error(),
 			})
 		}
+		DB.Model(&account).Update("status", 2)
 		return
 	}
+
+	// 邮箱账户可用，更新数据库
+	DB.Model(&account).Update("status", 1)
 
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{
