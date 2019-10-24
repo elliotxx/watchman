@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, message, Radio, Popconfirm } from 'antd';
+import { Table, Button, message, Radio, Popconfirm, Badge, Tag, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { globalConfig } from '../config'
@@ -15,7 +15,7 @@ class Account extends React.Component {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
-            width: '40%',
+            width: '30%',
             render: (text) => (
                 <div style={{ wordWrap: 'break-word', wordBreak: 'break-all' }}>
                     {text}
@@ -29,14 +29,38 @@ class Account extends React.Component {
             render: () => ('********'),
         },
         {
+            title: '是否可用',
+            key: 'status',
+            dataIndex: 'status',
+            render: (text) => {
+                console.log(text);
+                switch (text) {
+                    case 1:
+                        return <Badge status="success" text={<Tag color="green">可用</Tag>}/>;
+                    case 2:
+                        return <Badge status="error" text={<Tag color="red">不可用</Tag>}/>;
+                    case 3:
+                        return <Badge status="processing" text={<Tag color="blue">测试中</Tag>}/>;
+                    default:
+                        return <Badge status="default" text={<Tag color="gray">未测试</Tag>}/>;
+                }
+            },
+        },
+        {
             title: '操作',
             key: 'action',
-            render: (text, record) => (
+            render: (text, record) => {
+                console.log(record);
+                return (
                 <span>
                     <Radio.Group>
                         <Link to={{pathname: '/editaccount', state: {account: record}}}>
                             <Radio.Button>编辑</Radio.Button>
                         </Link>
+                        <Radio.Button onClick={ () => {this.testEmail(record)} } >
+                            {record.status === 3 && <Icon type="loading" style={{marginRight: 5}} />}
+                            测试
+                        </Radio.Button>
                         <Popconfirm
                             title="真的要删掉我吗？"
                             onConfirm={ () => {this.handleDelete(record)} }
@@ -47,9 +71,37 @@ class Account extends React.Component {
                         </Popconfirm>
                     </Radio.Group>
                 </span>
-            ),
+            )},
         },
     ];
+
+    testEmail = (record) => {
+        // 测试当前 Email 账户的连通性，即是否能用来发送邮件
+        let accounts = this.state.accounts;
+        let i = accounts.findIndex(item => record.ID === item.ID);
+        accounts[i].status = 3;     // loading
+        this.setState({ accounts: accounts }, () => {this.forceUpdate()});
+
+        let data = {
+            email : record.email,
+        };
+        // 发送 get 请求到后端
+        axios.post(globalConfig.rootPath + '/api/v1/testemail', data)
+            .then( () => {
+                accounts[i].status = 1;     // success
+                this.setState({accounts : accounts});
+                message.success("该 Email 账户身份验证通过，可以发送邮件");
+            })
+            .catch( e => {
+                accounts[i].status = 2;     // fail
+                this.setState({accounts : accounts});
+                console.log(e);
+                if (e && e.response && e.response.data && e.response.data.message)
+                    message.error(e.response.data.message);
+                else
+                    message.error(e.message);
+            });
+    };
 
     UNSAFE_componentWillMount() {
         // 同步一次 accounts 数据

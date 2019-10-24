@@ -67,14 +67,12 @@ class EditAccount extends React.Component {
         const { getFieldValue } = this.props.form;
 
         this.setState({"testEmailStatus" : "loading"});
-        let params = {
-            params: {
-                email : getFieldValue("email"),
-                password: getFieldValue("password"),
-            }
+        let data = {
+            email : getFieldValue("email"),
+            password: getFieldValue("password"),
         };
         // 发送 get 请求到后端
-        axios.get(globalConfig.rootPath + '/api/v1/testemail', params)
+        axios.post(globalConfig.rootPath + '/api/v1/testemail', data)
             .then( () => {
                 this.setState({"testEmailStatus" : "check-circle"});
                 message.success("该 Email 账户身份验证通过，可以发送邮件");
