@@ -365,10 +365,16 @@ func ListAccount(c *gin.Context) {
 func TestPattern(c *gin.Context) {
 	// 获取参数
 	var result string
+	var job Job
 	var err error
 	patternType := c.DefaultQuery("type", "re")
+	id := c.Query("id")
 	url := c.Query("url")
 	pattern := c.Query("pattern")
+
+	// 从数据库中取出指定 id 的定时任务
+	// 状态更新不是强要求，所以这里获取失败也没关系
+	DB.Where("id = ?", id).First(&job)
 
 	// 根据 url 获取 html 源码
 	html, err := GetHtmlByUrl(url)
@@ -392,8 +398,13 @@ func TestPattern(c *gin.Context) {
 			"message": "抓取规则无效",
 			"reason":  err.Error(),
 		})
+		// 抓取规则无效，更新数据库
+		DB.Model(&job).Update("pattern_status", 2)
 		return
 	}
+
+	// 抓取规则有效，更新数据库
+	DB.Model(&job).Update("pattern_status", 1)
 
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{
