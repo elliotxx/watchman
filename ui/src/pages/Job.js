@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, message, Radio, Tag, Badge, Popconfirm } from 'antd';
+import {Table, Button, message, Radio, Tag, Badge, Popconfirm, Icon, Tooltip} from 'antd';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { globalConfig } from '../config'
@@ -44,6 +44,25 @@ class Job extends React.Component {
             }
         },
         {
+            // title: '抓取规则是否有效',
+            title: <Tooltip placement="right" title="可以点击【测试】按钮对抓取规则有效性进行验证"> 抓取规则是否有效 <Icon type="info-circle" theme="twoTone" /></Tooltip>,
+            key: 'patternStatus',
+            dataIndex: 'patternStatus',
+            render: (text) => {
+                console.log(text);
+                switch (text) {
+                    case 1:
+                        return <Badge status="success" text={<Tag color="green">可用</Tag>}/>;
+                    case 2:
+                        return <Badge status="error" text={<Tag color="red">不可用</Tag>}/>;
+                    case 3:
+                        return <Badge status="processing" text={<Tag color="blue">测试中</Tag>}/>;
+                    default:
+                        return <Badge status="default" text={<Tag color="gray">未测试</Tag>}/>;
+                }
+            },
+        },
+        {
             title: '操作',
             key: 'action',
             render: (text, record) => (
@@ -53,6 +72,10 @@ class Job extends React.Component {
                             <Radio.Button>编辑</Radio.Button>
                         </Link>
                         <Radio.Button onClick={ () => {this.handleSwitch(record)} }>{ record.status === 0 ? '暂停' : '开始' }</Radio.Button>
+                        <Radio.Button onClick={ () => {this.testPattern(record)} } >
+                            {record.patternStatus === 3 && <Icon type="loading" style={{marginRight: 5}} />}
+                            测试
+                        </Radio.Button>
                         <Popconfirm
                             title="真的要删掉我吗？"
                             onConfirm={ () => {this.handleDelete(record)} }
@@ -71,6 +94,40 @@ class Job extends React.Component {
             ),
         },
     ];
+
+    testPattern = (record) => {
+        // 测试当前定时任务中抓取规则的有效性，即是否能匹配到内容
+        let jobs = this.state.jobs;
+        let i = jobs.findIndex(item => record.ID === item.ID);
+        jobs[i].patternStatus = 3;     // loading
+        this.setState({ jobs: jobs }, () => {this.forceUpdate()});
+
+        let data = {
+            params: {
+                type    : "re",
+                url     : record.url,
+                pattern : record.pattern,
+            }
+        };
+        // 发送 get 请求到后端
+        axios.get(globalConfig.rootPath + '/api/v1/testpattern', data)
+            .then( (response) => {
+                jobs[i].patternStatus = 1;     // success
+                this.setState({jobs : jobs});
+                if (response && response.data && response.data.data)
+                    message.success("定时任务【"+jobs[i].name+"】抓取到内容："+response.data.data);
+                message.success("定时任务【"+jobs[i].name+"】的抓取规则有效");
+            })
+            .catch( e => {
+                jobs[i].patternStatus = 2;     // fail
+                this.setState({jobs : jobs});
+                console.log(e);
+                if (e && e.response && e.response.data && e.response.data.message)
+                    message.error(e.response.data.message);
+                else
+                    message.error(e.message);
+            });
+    };
 
     handleSwitch = (record) => {
         // 暂停/开始按钮响应函数
