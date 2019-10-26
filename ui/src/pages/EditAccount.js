@@ -54,7 +54,7 @@ class EditAccount extends React.Component {
                             if (e.response.data.reason === "UNIQUE constraint failed: accounts.email") {
                                 message.error('该 Email 账户已存在');
                             } else {
-                                message.error(e.response.data.message);
+                                message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
                             }
                         } else {
                             message.error(e.message);
@@ -70,7 +70,7 @@ class EditAccount extends React.Component {
 
         this.setState({"testEmailStatus" : "loading"});
         let data = {
-            id : this.state.account.ID,
+            id : this.state.account && this.state.account.ID ? this.state.account.ID : 0,
             email : getFieldValue("email"),
             password: getFieldValue("password"),
             host: getFieldValue("host"),
@@ -86,7 +86,7 @@ class EditAccount extends React.Component {
                 this.setState({"testEmailStatus" : "close-circle"});
                 console.log(e);
                 if (e && e.response && e.response.data && e.response.data.message)
-                    message.error(e.response.data.message);
+                    message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
                 else
                     message.error(e.message);
             });

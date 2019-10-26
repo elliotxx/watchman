@@ -101,7 +101,7 @@ class Account extends React.Component {
                 this.setState({accounts : accounts});
                 console.log(e);
                 if (e && e.response && e.response.data && e.response.data.message)
-                    message.error(e.response.data.message);
+                    message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
                 else
                     message.error(e.message);
             });
@@ -136,7 +136,7 @@ class Account extends React.Component {
             .catch( e => {
                 console.log(e);
                 if (e && e.response && e.response.data && e.response.data.message)
-                    message.error(e.response.data.message);
+                    message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
                 else
                     message.error(e.message);
             });
@@ -155,7 +155,7 @@ class Account extends React.Component {
             .catch(e => {
                 console.log(e);
                 if (e && e.response && e.response.data && e.response.data.message)
-                    message.error(e.response.data.message);
+                    message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
                 else
                     message.error(e.message);
             });

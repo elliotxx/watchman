@@ -50,7 +50,7 @@ class EditJob extends React.Component {
             .catch(e => {
                 console.log(e);
                 if (e && e.response && e.response.data && e.response.data.message)
-                    message.error(e.response.data.message);
+                    message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
                 else
                     message.error(e.message);
             });
@@ -71,7 +71,7 @@ class EditJob extends React.Component {
         this.setState({"testPatternStatus" : "loading"});
         let params = {
             params: {
-                id : this.state.job.ID,
+                id : this.state.job && this.state.job.ID ? this.state.job.ID : 0,
                 url : getFieldValue("url"),
                 type: "re",
                 pattern: getFieldValue("pattern"),
@@ -91,7 +91,7 @@ class EditJob extends React.Component {
                 this.setState({"testPatternStatus" : "close-circle"});
                 console.log(e);
                 if (e && e.response && e.response.data && e.response.data.message)
-                    message.error(e.response.data.message);
+                    message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
                 else
                     message.error(e.message);
             });
@@ -120,7 +120,7 @@ class EditJob extends React.Component {
                     .catch( e => {
                         console.log(e);
                         if (e && e.response && e.response.data && e.response.data.message)
-                            message.error(e.response.data.message);
+                            message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
                         else
                             message.error(e.message);
                     });

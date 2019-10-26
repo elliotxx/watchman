@@ -36,7 +36,7 @@ class App extends React.Component {
                         <Title level={4} style={{color:'white', margin:10, textAlign:'center'}}>更夫 (watchman)</Title>
                         <Menu theme="dark" defaultSelectedKeys={[window.location.hash]} mode="inline">
                             <Menu.Item key="#/job" link='/job'>
-                                <Icon type="pie-chart" />
+                                <Icon type="carry-out" />
                                 <Link to='/job'>定时任务</Link>
                             </Menu.Item>
                             <Menu.Item key="#/account" link='/account'>
@@ -75,7 +75,7 @@ class App extends React.Component {
                             </div>
 
                         </Content>
-                        <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+                        <Footer style={{ textAlign: 'center' }}>Ant Design ©2019 Created by Ant UED</Footer>
                     </Layout>
                 </Layout>
             </HashRouter>
