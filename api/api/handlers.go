@@ -7,7 +7,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/robfig/cron/v3"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -200,16 +199,17 @@ func UpdateJob(c *gin.Context) {
 func ListJob(c *gin.Context) {
 	// 从 url 获取参数
 	var jobs []Job
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "从 url 解析参数失败",
-			"reason":  err.Error(),
-		})
-		return
-	}
+	//limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	//if err != nil {
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+	//		"message": "从 url 解析参数失败",
+	//		"reason":  err.Error(),
+	//	})
+	//	return
+	//}
 	// 指定要检索的记录数
-	err = DB.Limit(limit).Find(&jobs).Error
+	//err = DB.Limit(limit).Find(&jobs).Error
+	err := DB.Find(&jobs).Error
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "定时任务获取失败",
@@ -313,7 +313,7 @@ func UpdateAccount(c *gin.Context) {
 	//	return
 	//}
 
-	// 根据通知账户Email找到该通知账户，并更新它
+	// 根据通知账户 ID 找到该通知账户，并更新它
 	err = DB.Where("id = ?", account.ID).Save(&account).Error
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -333,16 +333,17 @@ func UpdateAccount(c *gin.Context) {
 func ListAccount(c *gin.Context) {
 	// 从 url 获取参数
 	var accounts []Account
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "从 url 解析参数失败",
-			"reason":  err.Error(),
-		})
-		return
-	}
+	//limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	//if err != nil {
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+	//		"message": "从 url 解析参数失败",
+	//		"reason":  err.Error(),
+	//	})
+	//	return
+	//}
 	// 指定要检索的记录数
-	err = DB.Limit(limit).Find(&accounts).Error
+	//err := DB.Limit(limit).Find(&accounts).Error
+	err := DB.Find(&accounts).Error
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message": "通知账户列表获取失败",
@@ -399,13 +400,17 @@ func TestPattern(c *gin.Context) {
 			"reason":  err.Error(),
 		})
 		// 抓取规则无效，更新数据库
-		glog.Info(job);
-		DB.Model(&job).Update("pattern_status", 2)
+		glog.Info(job)
+		if job.ID != 0 {
+			DB.Model(&job).Update("pattern_status", 2)
+		}
 		return
 	}
 
 	// 抓取规则有效，更新数据库
-	DB.Model(&job).Update("pattern_status", 1)
+	if job.ID != 0 {
+		DB.Model(&job).Update("pattern_status", 1)
+	}
 
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{
@@ -464,15 +469,139 @@ func TestEmail(c *gin.Context) {
 				"reason":  err.Error(),
 			})
 		}
-		DB.Model(&account).Update("status", 2)
+		if account.ID != 0 {
+			DB.Model(&account).Update("status", 2)
+		}
 		return
 	}
 
 	// 邮箱账户可用，更新数据库
-	DB.Model(&account).Update("status", 1)
+	if account.ID != 0 {
+		DB.Model(&account).Update("status", 1)
+	}
 
 	// 返回结果
 	c.JSON(http.StatusOK, gin.H{
 		"message": "该 Email 账户身份验证通过，可以发送邮件",
+	})
+}
+
+// 接口：添加任务模板
+func AddTemplate(c *gin.Context) {
+	// 从 post form 中提取参数
+	var template Template
+	if err := c.BindJSON(&template); err != nil {
+		// 解析失败
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "JSON 解析失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 写入数据库
+	err := DB.Create(&template).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "任务模板创建失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 返回 response
+	c.JSON(http.StatusOK, gin.H{
+		"message": "任务模板创建成功",
+	})
+}
+
+// 接口：删除指定任务模板
+func DeleteTemplate(c *gin.Context) {
+	// 从 post form 中提取参数
+	var template Template
+	if err := c.BindJSON(&template); err != nil {
+		// 解析失败
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "JSON 解析失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 根据 Name 找到任务模板，并删除它
+	// 手动软删除: 如果模型有DeletedAt字段，它将自动获得软删除功能！ 那么在调用Delete时不会从数据库中永久删除，而是只将字段DeletedAt的值设置为当前时间。
+	// 这里手动进行 update 来软删除
+	now := time.Now()
+	err := DB.Model(&template).Updates(Template{Name: template.Name + now.String(), Model: gorm.Model{DeletedAt: &now}}).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "任务模板删除失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 返回 response
+	c.JSON(http.StatusOK, gin.H{
+		"message": "任务模板删除成功",
+	})
+}
+
+// 接口：更新任务模板
+func UpdateTemplate(c *gin.Context) {
+	// 从 post form 中提取参数
+	var template Template
+	var err error
+	if err := c.BindJSON(&template); err != nil {
+		// 解析失败
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "JSON 解析失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 根据任务模板 ID 找到该任务模板，并更新它
+	err = DB.Where("id = ?", template.ID).Save(&template).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "任务模板更新失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+
+	// 返回 response
+	c.JSON(http.StatusOK, gin.H{
+		"message": "任务模板更新成功",
+	})
+}
+
+// 接口：获取所有任务模板
+func ListTemplate(c *gin.Context) {
+	// 从 url 获取参数
+	var templates []Template
+	//limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	//if err != nil {
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+	//		"message": "从 url 解析参数失败",
+	//		"reason":  err.Error(),
+	//	})
+	//	return
+	//}
+	// 指定要检索的记录数
+	//err := DB.Limit(limit).Find(&templates).Error
+	err := DB.Find(&templates).Error
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "任务模板列表获取失败",
+			"reason":  err.Error(),
+		})
+		return
+	}
+	// 返回结果
+	c.JSON(http.StatusOK, gin.H{
+		"message": "获取任务模板列表成功",
+		"data":    templates,
 	})
 }

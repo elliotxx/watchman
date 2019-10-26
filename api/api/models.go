@@ -31,6 +31,14 @@ type Account struct {
 	Status   int    `json:"status"`                        // Email 账户的连通性，是否可以用来发邮件；0 代表未测试，是默认值；1 代表测试有效；2 代表测试无效；3 代表测试中；
 }
 
+type Template struct {
+	gorm.Model
+	Name    string `json:"name" gorm:"not null;unique"`       // 模板名称，设置字段为非空并唯一
+	Cron    string `json:"cron"`                              // 定时配置
+	Pattern string `json:"pattern" gorm:"type:varchar(2000)"` // 抓取规则
+	Content string `json:"content" gorm:"type:varchar(2000)"` // 邮件内容
+}
+
 // JobFunc 定义
 type JobFunc struct {
 	Job Job // 包含定时任务运行的必要信息，比如抓取目标 URL，匹配规则等
