@@ -99,11 +99,13 @@ class Job extends React.Component {
         // 测试当前定时任务中抓取规则的有效性，即是否能匹配到内容
         let jobs = this.state.jobs;
         let i = jobs.findIndex(item => record.ID === item.ID);
+        console.log(record.ID, i);
         jobs[i].patternStatus = 3;     // loading
-        this.setState({ jobs: jobs }, () => {this.forceUpdate()});
+        this.setState({ jobs: jobs });
 
         let data = {
             params: {
+                id      : record.ID,
                 type    : "re",
                 url     : record.url,
                 pattern : record.pattern,
@@ -115,7 +117,7 @@ class Job extends React.Component {
                 jobs[i].patternStatus = 1;     // success
                 this.setState({jobs : jobs});
                 if (response && response.data && response.data.data)
-                    message.success("定时任务【"+jobs[i].name+"】抓取到内容："+response.data.data);
+                    message.success("定时任务【"+jobs[i].name+"】抓取到内容 => "+response.data.data);
                 message.success("定时任务【"+jobs[i].name+"】的抓取规则有效");
             })
             .catch( e => {

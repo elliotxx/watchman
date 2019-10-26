@@ -144,6 +144,25 @@ class EditAccount extends React.Component {
                     )}
                 </Form.Item>
 
+
+                <Form.Item label="SMTP 服务器地址（可选）" colon={false} >
+                    {getFieldDecorator('host', {})(
+                        <Input
+                            prefix={<Icon type="database" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            placeholder="请输入 SMTP 服务器地址..."
+                        />,
+                    )}
+                </Form.Item>
+
+                <Form.Item label="SMTP 服务器端口（可选）" colon={false} >
+                    {getFieldDecorator('port', {})(
+                        <Input
+                            prefix={<Icon type="api" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                            placeholder="请输入 SMTP 服务器端口..."
+                        />,
+                    )}
+                </Form.Item>
+
                 <Form.Item>
                     <Button type="primary" htmlType="submit">
                         { this.state.isEdit? '提交' : '添加' }
