@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Button, message, Radio, Popconfirm, Badge, Tag, Icon } from 'antd';
+import { Table, Button, message, Radio, Popconfirm, Badge, Tag, Icon, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { globalConfig } from '../config'
@@ -29,7 +29,8 @@ class Account extends React.Component {
             render: () => ('********'),
         },
         {
-            title: '是否可用',
+            // title: '是否可用',
+            title: <Tooltip placement="right" title="可以点击【测试】按钮检测 Email 账号是否可用"> 是否可用 <Icon type="info-circle" theme="twoTone" /></Tooltip>,
             key: 'status',
             dataIndex: 'status',
             render: (text) => {
@@ -83,7 +84,10 @@ class Account extends React.Component {
         this.setState({ accounts: accounts }, () => {this.forceUpdate()});
 
         let data = {
+            id    : record.ID,
             email : record.email,
+            host  : record.host,
+            port  : parseInt(record.port),
         };
         // 发送 get 请求到后端
         axios.post(globalConfig.rootPath + '/api/v1/testemail', data)

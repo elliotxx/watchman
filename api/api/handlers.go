@@ -367,10 +367,10 @@ func TestPattern(c *gin.Context) {
 	var result string
 	var job Job
 	var err error
-	patternType := c.DefaultQuery("type", "re")
 	id := c.Query("id")
 	url := c.Query("url")
 	pattern := c.Query("pattern")
+	patternType := c.DefaultQuery("type", "re")
 
 	// 从数据库中取出指定 id 的定时任务
 	// 状态更新不是强要求，所以这里获取失败也没关系
@@ -399,6 +399,7 @@ func TestPattern(c *gin.Context) {
 			"reason":  err.Error(),
 		})
 		// 抓取规则无效，更新数据库
+		glog.Info(job);
 		DB.Model(&job).Update("pattern_status", 2)
 		return
 	}
@@ -426,15 +427,13 @@ func TestEmail(c *gin.Context) {
 		})
 		return
 	}
-	email := account.Email
-	password := account.Password
 
-	// 判断密码是否为空
 	// 如果没请求密码参数，就从数据库中取出密码
-	if password == "" {
+	// 判断密码是否为空
+	if account.Password == "" {
+		var account_tmp Account
 		// 空密码，表示请求参数里没有填写密码信息，那么就从数据库中取出该 email 对应的密码
-		account = Account{}
-		err = DB.Where("email = ?", email).First(&account).Error
+		err = DB.Where("email = ?", account.Email).First(&account_tmp).Error
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "该 Email 账户不存在",
@@ -442,14 +441,11 @@ func TestEmail(c *gin.Context) {
 			})
 			return
 		}
-		password = account.Password
+		account.Password = account_tmp.Password
 	}
 
 	// 测试该账户的连通性（该 Email 账户是否能用来发送邮件）
-	err = IsConnectedEmail(Account{
-		Email:    email,
-		Password: password,
-	})
+	err = IsConnectedEmail(account)
 	if err != nil {
 		switch err.Error() {
 		case "Error parsing email to suffix":
@@ -459,7 +455,7 @@ func TestEmail(c *gin.Context) {
 			})
 		case "No corresponding host and port found":
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": "没有该 Email 账户匹配的主机和端口号",
+				"message": "没有该 Email 账户匹配的主机和端口号，请手动输入",
 				"reason":  err.Error(),
 			})
 		default:

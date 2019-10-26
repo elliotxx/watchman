@@ -71,6 +71,7 @@ class EditJob extends React.Component {
         this.setState({"testPatternStatus" : "loading"});
         let params = {
             params: {
+                id : this.state.job.ID,
                 url : getFieldValue("url"),
                 type: "re",
                 pattern: getFieldValue("pattern"),

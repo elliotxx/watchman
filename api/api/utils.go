@@ -154,8 +154,18 @@ func DetermineEncoding(r io.Reader) ([]byte, error) {
 
 func SendMail(account Account, mailTo []string, subject string, body string) error {
 	// 解析发送邮箱的主机和端口号
-	host, port, err := ParseEmailHostport(account.Email)
+	var err error
+	var host string
+	var port int
+	if account.Host == "" || account.Port == 0 {
+		// 如果未提供 Host 或者 Port，就从 Email 解析
+		host, port, err = ParseHostportByEmail(account.Email)
+	} else {
+		host = account.Host
+		port = account.Port
+	}
 	if err != nil {
+		// 如果从 Email 解析出错，那么就报错并退出
 		return err
 	}
 
@@ -174,7 +184,7 @@ func SendMail(account Account, mailTo []string, subject string, body string) err
 	return err
 }
 
-func ParseEmailHostport(email string) (string, int, error) {
+func ParseHostportByEmail(email string) (string, int, error) {
 	// 获取 email 后缀，比如 xxx@qq.com，后缀为 qq.com
 	result := strings.Split(email, "@")
 	if len(result) <= 1 {
@@ -195,8 +205,18 @@ func ParseEmailHostport(email string) (string, int, error) {
 func IsConnectedEmail(account Account) error {
 	// 测试该 Email 账户是否连通
 	// 解析 Email 的主机和端口号
-	host, port, err := ParseEmailHostport(account.Email)
+	var err error
+	var host string
+	var port int
+	if account.Host == "" || account.Port == 0 {
+		// 如果未提供 Host 或者 Port，就从 Email 解析
+		host, port, err = ParseHostportByEmail(account.Email)
+	} else {
+		host = account.Host
+		port = account.Port
+	}
 	if err != nil {
+		// 如果从 Email 解析出错，那么就报错并退出
 		return err
 	}
 	// 拨号并向 SMTP 服务器进行身份验证

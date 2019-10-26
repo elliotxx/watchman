@@ -26,7 +26,7 @@ type Account struct {
 	gorm.Model
 	Email    string `json:"email" gorm:"not null;unique"`  // 邮箱
 	Password string `json:"password" gorm:"not null"`      // 邮箱密码 / 授权码
-	Host     string `json:"host" gorm:"type:varchar(100)"` // 邮箱 SMTP 主机
+	Host     string `json:"host" gorm:"type:varchar(200)"` // 邮箱 SMTP 主机
 	Port     int    `json:"port"`                          // 邮箱 SMTP 端口号
 	Status   int    `json:"status"`                        // Email 账户的连通性，是否可以用来发邮件；0 代表未测试，是默认值；1 代表测试有效；2 代表测试无效；3 代表测试中；
 }

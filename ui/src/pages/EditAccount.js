@@ -31,6 +31,8 @@ class EditAccount extends React.Component {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
+                // string 转 int
+                values.port = parseInt(values.port);
                 // console.log('Received values of form: ', values);
                 // 发送 post 请求到后端
                 let method = this.state.isEdit ? axios.put : axios.post;
@@ -68,8 +70,11 @@ class EditAccount extends React.Component {
 
         this.setState({"testEmailStatus" : "loading"});
         let data = {
+            id : this.state.account.ID,
             email : getFieldValue("email"),
             password: getFieldValue("password"),
+            host: getFieldValue("host"),
+            port: parseInt(getFieldValue("port")),
         };
         // 发送 get 请求到后端
         axios.post(globalConfig.rootPath + '/api/v1/testemail', data)
@@ -146,7 +151,9 @@ class EditAccount extends React.Component {
 
 
                 <Form.Item label="SMTP 服务器地址（可选）" colon={false} >
-                    {getFieldDecorator('host', {})(
+                    {getFieldDecorator('host', {
+                        initialValue: this.state.isEdit? this.state.account.host : '',
+                    })(
                         <Input
                             prefix={<Icon type="database" style={{ color: 'rgba(0,0,0,.25)' }} />}
                             placeholder="请输入 SMTP 服务器地址..."
@@ -155,7 +162,9 @@ class EditAccount extends React.Component {
                 </Form.Item>
 
                 <Form.Item label="SMTP 服务器端口（可选）" colon={false} >
-                    {getFieldDecorator('port', {})(
+                    {getFieldDecorator('port', {
+                        initialValue: this.state.isEdit? (this.state.account.port === 0 ? '' : this.state.account.port) : '',
+                    })(
                         <Input
                             prefix={<Icon type="api" style={{ color: 'rgba(0,0,0,.25)' }} />}
                             placeholder="请输入 SMTP 服务器端口..."
