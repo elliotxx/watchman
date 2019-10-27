@@ -9,6 +9,8 @@ import {
     Icon,
     Divider,
     Drawer,
+    Dropdown,
+    Menu,
 } from 'antd';
 import { InputCron } from 'antcloud-react-crons'
 import { Link } from 'react-router-dom'
@@ -22,13 +24,16 @@ const { TextArea } = Input;
 class EditJob extends React.Component {
     constructor(props) {
         super(props);
+        // 首先同步一次数据
         this.getAllAccounts();
+        this.getAllTemplates();
 
         // 初始化 state
         this.state = {
             isEdit: false,              // 是否为编辑模式
             isVisibleDrawer: false,     // 正则手册的抽屉是否可见
-            emails: [],                 // 已经添加的 emails 们
+            emails: [],                 // 已经添加的通知账户 emails 们
+            templates: [],              // 已经添加的任务模板 template 们
             testPatternStatus: "play-circle"        // pattern 测试的状态，play-circle 代表测试前，loading 代表测试中，check-circle 代表测试成功，close-circle 代表测试失败
         };
         if (props.location.state && props.location.state.job) {
@@ -36,6 +41,7 @@ class EditJob extends React.Component {
             this.state.job = props.location.state.job;
         }
     }
+
     getAllAccounts = () => {
         // 获取所有 accounts 数据，并更新 state
         axios.get(globalConfig.rootPath + '/api/v1/account')
@@ -140,6 +146,41 @@ class EditJob extends React.Component {
         });
     };
 
+    handleTemplateClick = (e) => {
+        // 模板被选中时，填充到表单中
+        console.log(e);
+        console.log(this.state.templates);
+        console.log(e.item.props.children[1]);
+        const { setFieldsValue } = this.props.form;
+        // 拿到被选中模板的数据
+        let selectedTemplate = this.state.templates.filter( v => { return v.name === e.item.props.children[1] });
+        if (selectedTemplate.length < 1)
+            return ;
+        selectedTemplate = selectedTemplate[0];
+        // 填充到表单中
+        setFieldsValue({
+            cron: selectedTemplate.cron,
+            pattern: selectedTemplate.pattern,
+            content: selectedTemplate.content,
+        });
+    };
+
+    getAllTemplates = () => {
+        // 获取全部任务模板，并更新 state
+        axios.get(globalConfig.rootPath + '/api/v1/template')
+            .then(res => {
+                console.log(res);
+                this.setState({'templates': res.data.data});
+            })
+            .catch(e => {
+                console.log(e);
+                if (e && e.response && e.response.data && e.response.data.message)
+                    message.error("[message] " + e.response.data.message + " [reason] " + e.response.data.reason);
+                else
+                    message.error(e.message);
+            });
+    };
+
     render() {
         const { getFieldDecorator } = this.props.form;
 
@@ -150,6 +191,11 @@ class EditJob extends React.Component {
                 emailOptions.push(<Option key={email}>{email}</Option>);
             });
         }
+
+        // 模板下拉框内容
+        const templatesContent = this.state.templates.map( (value, index) => (
+            <Menu.Item key={index}><Icon type="file"/>{value.name}</Menu.Item>
+        ));
 
         let markdown = `
 ## 示例
@@ -488,7 +534,14 @@ class EditJob extends React.Component {
             <div id="job-form">
                 <Form onSubmit={this.handleSubmit}>
                     {/*<PageHeader onBack={() => this.props.history.goBack()} title="定时任务配置" subTitle="This is a subtitle" />*/}
-                    <Typography.Title level={4} type="secondary"><Icon type="left" onClick={() => this.props.history.goBack()} style={{marginRight: '5px'}}/> 定时任务配置</Typography.Title>
+                    <div id="edit-header" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }} >
+                        <Typography.Title level={4} type="secondary"><Icon type="left" onClick={() => this.props.history.goBack()} style={{marginRight: '5px'}}/> 定时任务配置</Typography.Title>
+                        <Dropdown overlay={<Menu onClick={this.handleTemplateClick}>{templatesContent}</Menu>} onFocus={this.getAllTemplates}>
+                            <Button>
+                                选择模板 <Icon type="down" />
+                            </Button>
+                        </Dropdown>
+                    </div>
                     <hr/>
                     <Form.Item label="任务名称">
                         {getFieldDecorator('name', {

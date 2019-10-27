@@ -200,8 +200,27 @@ class Job extends React.Component {
     expandedRowRender = (record) => {
         try {
             const columns = [
-                { title: 'row', dataIndex: 'row', key: 'row', width: '10%'},
-                { title: 'value', dataIndex: 'value', key: 'value' },
+                {
+                    title: 'row',
+                    dataIndex: 'row',
+                    key: 'row',
+                    width: '15%',
+                    render: (text) => (
+                        <div style={{ wordWrap: 'break-word', wordBreak: 'break-all' }}>
+                            {text}
+                        </div>
+                    ),
+                },
+                {
+                    title: 'value',
+                    dataIndex: 'value',
+                    key: 'value',
+                    render: (text) => (
+                        <div style={{ wordWrap: 'break-word', wordBreak: 'break-all' }}>
+                            {text}
+                        </div>
+                    ),
+                },
             ];
             const data = [
                 {
