@@ -85,27 +85,30 @@ func main() {
 	}))
 
 	// 添加接口路由及响应函数
-	// 定时任务 CRUD 接口
-	r.POST("/api/v1/job", api.AddJob)
-	r.DELETE("/api/v1/job", api.DeleteJob)
-	r.PUT("/api/v1/job", api.UpdateJob)
-	r.GET("/api/v1/job", api.ListJob)
+	v1 := r.Group("/api/v1")
+	{
+		// 定时任务 CRUD 接口
+		v1.POST("/job", api.AddJob)
+		v1.DELETE("/job", api.DeleteJob)
+		v1.PUT("/job", api.UpdateJob)
+		v1.GET("/job", api.ListJob)
 
-	// 通知账户 CRUD 接口
-	r.POST("/api/v1/account", api.AddAccount)
-	r.DELETE("/api/v1/account", api.DeleteAccount)
-	r.PUT("/api/v1/account", api.UpdateAccount)
-	r.GET("/api/v1/account", api.ListAccount)
+		// 通知账户 CRUD 接口
+		v1.POST("/account", api.AddAccount)
+		v1.DELETE("/account", api.DeleteAccount)
+		v1.PUT("/account", api.UpdateAccount)
+		v1.GET("/account", api.ListAccount)
 
-	// 测试功能接口
-	r.GET("/api/v1/testpattern", api.TestPattern)
-	r.POST("/api/v1/testemail", api.TestEmail)
+		// 测试功能接口
+		v1.GET("/testpattern", api.TestPattern)
+		v1.POST("/testemail", api.TestEmail)
 
-	// 任务模板 CRUD 接口
-	r.POST("/api/v1/template", api.AddTemplate)
-	r.DELETE("/api/v1/template", api.DeleteTemplate)
-	r.PUT("/api/v1/template", api.UpdateTemplate)
-	r.GET("/api/v1/template", api.ListTemplate)
+		// 任务模板 CRUD 接口
+		v1.POST("/template", api.AddTemplate)
+		v1.DELETE("/template", api.DeleteTemplate)
+		v1.PUT("/template", api.UpdateTemplate)
+		v1.GET("/template", api.ListTemplate)
+	}
 
 	// 让服务跑起来，默认监听 0.0.0.0:8080，也可以通过环境变量 GIN_PORT 指定
 	port := os.Getenv("GIN_PORT")
