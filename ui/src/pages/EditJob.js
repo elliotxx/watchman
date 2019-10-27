@@ -643,7 +643,8 @@ class EditJob extends React.Component {
                     </Form.Item>
                     <Form.Item label="" style={{disable: true}}>
                         {getFieldDecorator('entryId', {
-                            initialValue: 0,
+                            initialValue: this.state.isEdit? this.state.job.entryId : 0,
+                            // initialValue: 0,
                         })(<div/>)}
                     </Form.Item>
                     <Form.Item>
