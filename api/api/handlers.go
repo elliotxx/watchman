@@ -10,6 +10,17 @@ import (
 	"time"
 )
 
+// 接口：测试当前是否认证通过
+func SecretsHandler(c *gin.Context) {
+	// 测试当前是否认证通过
+	user := c.MustGet(gin.AuthUserKey).(string)
+	if _, ok := Secrets[user]; ok {
+		c.JSON(http.StatusOK, gin.H{"message": "认证成功", gin.AuthUserKey: user})
+	} else {
+		c.JSON(http.StatusUnauthorized, gin.H{gin.AuthUserKey: user, "message": "该账号不存在"})
+	}
+}
+
 // 接口：添加定时任务
 func AddJob(c *gin.Context) {
 	// 从 post form 中提取参数

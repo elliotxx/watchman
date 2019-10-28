@@ -78,15 +78,19 @@ func main() {
 	// 添加 cros 中间件，允许跨域访问
 	r.Use(cors.New(cors.Config{
 		AllowOriginFunc:  func(origin string) bool { return true },
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
-		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// 添加接口路由及响应函数
-	v1 := r.Group("/api/v1")
+	// 添加接口组路由及响应函数
+	// 同时声明该组路由都需要验证
+	v1 := r.Group("/api/v1", gin.BasicAuth(gin.Accounts(api.Secrets)))
 	{
+		// 测试当前是否认证通过
+		v1.GET("/secrets", api.SecretsHandler)
+
 		// 定时任务 CRUD 接口
 		v1.POST("/job", api.AddJob)
 		v1.DELETE("/job", api.DeleteJob)

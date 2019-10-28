@@ -19,3 +19,8 @@ var Timeout = 30
 // 邮件发送配置
 // 主题
 var EmailSubject = "【更新提示】%s 有更新！"
+
+// 权限配置（登录用户名、密码）
+var Secrets = map[string]string{
+	"admin": "12345",
+}
