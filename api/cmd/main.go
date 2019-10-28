@@ -86,7 +86,10 @@ func main() {
 
 	// 添加接口组路由及响应函数
 	// 同时声明该组路由都需要验证
-	v1 := r.Group("/api/v1", gin.BasicAuth(gin.Accounts(api.Secrets)))
+	var v1 = r.Group("/api/v1")
+	if api.IsBasicAuth {
+		v1.Handlers = append(v1.Handlers, gin.BasicAuth(gin.Accounts(api.Secrets)))
+	}
 	{
 		// 测试当前是否认证通过
 		v1.GET("/secrets", api.SecretsHandler)

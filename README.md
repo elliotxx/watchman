@@ -43,6 +43,19 @@ docker run -d -p 8007:80 --name=watchman registry.cn-shanghai.aliyuncs.com/ellio
 ```
 浏览器访问 ```127.0.0.1:8007``` 查看效果
 
+## 开启权限认证
+部署成功后，默认没有开启权限认证，也就是说接口都可以公开访问。
+
+如果要开启权限认证，请修改配置，采用 BasicAuth 进行认证。
+
+配置修改位置在 ```api/api/config.go L24```：
+```
+var IsBasicAuth = false // 修改这里开启权限控制（调用接口需要输入用户名 & 密码）
+var Secrets 	= map[string]string{    // 默认登录账户
+	"admin": "12345",
+}
+```
+
 ## 自动构建&部署（私人）
 ### 要触发 自动构建，需要推送 release-v 前缀的 tag
 示例：push 一个名为 ```release-v0.1.2``` 的 tag，docker hub 和 阿里云容器镜像服务 将同时开始自动构建，生成的镜像 tag 为 0.1.2
