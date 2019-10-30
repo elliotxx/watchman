@@ -94,6 +94,9 @@ func main() {
 		// 测试当前是否认证通过
 		v1.GET("/secrets", api.SecretsHandler)
 
+		// websocket 接口，持续返回日志内容
+		v1.GET("/websocket", api.LogTail)
+
 		// 定时任务 CRUD 接口
 		v1.POST("/job", api.AddJob)
 		v1.DELETE("/job", api.DeleteJob)

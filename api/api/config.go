@@ -25,3 +25,6 @@ var IsBasicAuth = false
 var Secrets = map[string]string{
 	"admin": "12345",
 }
+
+// 日志文件（LogTail 接口监控的日志文件）
+var LogFilepath = "/data/watchman.INFO"
