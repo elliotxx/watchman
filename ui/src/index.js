@@ -7,6 +7,7 @@ import Account from './pages/Account'
 import EditAccount from './pages/EditAccount'
 import EditTemplate from './pages/EditTemplate'
 import Template from './pages/Template'
+import Log from './pages/Log'
 import 'antd/dist/antd.css';
 import './index.css';
 import { HashRouter, Route, Link, Switch } from 'react-router-dom';
@@ -47,6 +48,10 @@ class App extends React.Component {
                                 <Icon type="file" />
                                 <Link to='/template'>模板配置</Link>
                             </Menu.Item>
+                            <Menu.Item key="#/log">
+                                <Icon type="fund" />
+                                <Link to='/log'>实时日志</Link>
+                            </Menu.Item>
                         </Menu>
                     </Sider>
                     <Layout>
@@ -62,7 +67,7 @@ class App extends React.Component {
                             {/*<Breadcrumb >*/}
                             {/*</Breadcrumb>*/}
                             {/*正文*/}
-                            <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                            <div style={{ padding: 24, minHeight: 360, background: '#fff' }}>
                                 <Switch>
                                     <Route exact path='/' breadcrumbName="首页" component={Job} />
                                     <Route exact path='/job' breadcrumbName="定时任务" component={Job} />
@@ -71,6 +76,7 @@ class App extends React.Component {
                                     <Route exact path='/editaccount' breadcrumbName="添加账户" component={EditAccount} />
                                     <Route exact path='/template' breadcrumbName="模板配置" component={Template} />
                                     <Route exact path='/edittemplate' breadcrumbName="创建模板" component={EditTemplate} />
+                                    <Route exact path='/log' breadcrumbName="实时日志" component={Log} />
                                 </Switch>
                             </div>
 

@@ -6,5 +6,8 @@ export const globalConfig = {
     rootPath : '',
 
     // 主页标题
-    rootTitle : 'Watchman 更夫'
+    rootTitle : 'Watchman 更夫',
+
+    // 日志页的最大显示长度
+    LogMaxLength : 10240,
 };
