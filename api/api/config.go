@@ -21,7 +21,7 @@ var Timeout = 30
 var EmailSubject = "【更新提示】%s 有更新！"
 
 // 权限配置（登录用户名、密码）
-var IsBasicAuth = false
+var IsBasicAuth = true
 var Secrets = map[string]string{
 	"admin": "12345",
 }
