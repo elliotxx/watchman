@@ -1,11 +1,40 @@
 ## 简介
 更夫（watchman）是一款可视化定时任务配置工具，集成有Web端交互界面、正则表达式解析、定时任务、邮件提醒、模板定制等功能。
 
-简单来说，更夫是一个Web应用程序，集成有前后端和数据库，可通过 Docker 或者镜像仓库进行一键部署，它的原理是通过在前端配置的定时任务，定时去和数据库中存储的数据对比，如果不一样，代表有更新，发送邮件进行提示，然后更新数据库。
+简单来说，更夫是一个 Web 应用程序，可以可视化的配置定时任务，通过指定抓取规则定时获取最新内容，如果有更新，就发送邮件通知。
+
+Watchman 采用前后端分离设计，数据库采用 Sqlite3，整体十分轻量，并可用 Docker 一键部署。
+
+设计思路见：[一个基于 Golang + React 的定时任务可视化配置网站的设计与实现](http://yangyingming.com/article/454/)
 
 在线 Demo：[http://watch.yangyingming.com](http://watch.yangyingming.com)
 
 **默认登录账号：admin 密码：12345**
+
+## 预览
+定时任务列表
+
+![](https://cdn.nlark.com/yuque/0/2019/png/376443/1572602368293-aa4bf43f-65c8-40e5-9307-358a3803b3cc.png)
+
+定时任务编辑页面
+
+![屏幕快照 2019-11-01 下午6.00.40.png](https://cdn.nlark.com/yuque/0/2019/png/376443/1572602454170-fd09e0b6-f206-4922-b85e-5ae5edd78bfe.png#align=left&display=inline&height=714&name=%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202019-11-01%20%E4%B8%8B%E5%8D%886.00.40.png&originHeight=714&originWidth=843&search=&size=76996&status=done&width=843)
+
+通知账户（Email）
+
+![屏幕快照 2019-11-01 下午6.01.38.png](https://cdn.nlark.com/yuque/0/2019/png/376443/1572602560439-ca61a6d8-eb2b-482e-ab13-415723e199ac.png#align=left&display=inline&height=380&name=%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202019-11-01%20%E4%B8%8B%E5%8D%886.01.38.png&originHeight=380&originWidth=1439&search=&size=52546&status=done&width=1439)
+
+实时日志
+
+![屏幕快照 2019-11-01 下午6.02.22.png](https://cdn.nlark.com/yuque/0/2019/png/376443/1572602586523-99032e49-427a-41c2-83e7-f3b1e55a23c9.png#align=left&display=inline&height=717&name=%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202019-11-01%20%E4%B8%8B%E5%8D%886.02.22.png&originHeight=717&originWidth=1440&search=&size=299288&status=done&width=1440)
+
+## 特性
+- 定时任务 创建/暂停/开始/编辑/删除
+- 通知账号 创建/编辑/删除
+- 通知账号（Email账号密码）有效性在线测试
+- 正则表达式在线测试
+- 前端实时查看日志
+- 定时模板（自动填充一些内容，比如抓取规则、邮件发送内容等）
 
 ## 依赖
 * 前端: React（AntDesign）
