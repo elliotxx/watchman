@@ -3,32 +3,39 @@
 
 简单来说，更夫是一个Web应用程序，集成有前后端和数据库，可通过 Docker 或者镜像仓库进行一键部署，它的原理是通过在前端配置的定时任务，定时去和数据库中存储的数据对比，如果不一样，代表有更新，发送邮件进行提示，然后更新数据库。
 
+在线 Demo：[http://watch.yangyingming.com](http://watch.yangyingming.com)
+
+**默认登录账号：admin 密码：12345**
+
 ## 依赖
 * 前端: React（AntDesign）
 * 后端: Golang 1.12
 * web 框架: Gin 1.4
 * 数据库: Sqlite3
 
-使用 go modules 安装后端依赖
+## 运行
+使用 go modules 安装后端依赖 & 运行后端
 ```
 cd api
 go mod tidy
+go run cmd/main.go
 ```
 使用 npm 安装前端依赖
 ```
 cd ui
 npm install
+npm start
 ```
 
-## 使用
-### 使用 Dockerfile 构建镜像 & 运行容器
+## 用 Docker 运行
+### 使用 Dockerfile 构建镜像
 ```
 docker build -f Dockerfile -t watchman .
 docker run -d -p 8007:80 --name=watchman watchman
 ```
 浏览器访问 ```127.0.0.1:8007``` 查看效果
 
-### 使用 Docker hub 拉取镜像 & 运行容器
+### 直接拉取镜像
 使用官方 Docker hub 拉取镜像（可能有些慢）
 ```
 docker pull elliotxx/watchman
@@ -55,36 +62,6 @@ var Secrets 	= map[string]string{    // 默认登录账户
 	"admin": "12345",
 }
 ```
-
-## 自动构建&部署（私人）
-### 要触发 自动构建，需要推送 release-v 前缀的 tag
-示例：push 一个名为 ```release-v0.1.2``` 的 tag，docker hub 和 阿里云容器镜像服务 将同时开始自动构建，生成的镜像 tag 为 0.1.2
-支持：docker hub 和 阿里云容器镜像服务 自动构建
-具体：
-```
-git tag -a release-v0.1.2 -m 'v0.1.2'
-git push origin release-v0.1.2
-```
-
-### 要触发 自动部署，需要推送名为 deploy 的 tag
-示例：push 一个名为 ```deploy``` 的 tag，docker hub 和 阿里云容器镜像服务 将同时开始自动构建，生成的镜像 tag 为 deploy，然后云服务器上会自动拉取镜像，最后运行镜像
-原理：通过阿里云容器镜像服务自动构建镜像，通过云服务器上的 webhooks 服务自动部署
-具体：
-```
-git tag -a deploy -m 'deploy version'
-git push origin deploy
-```
-
-## 功能
-- [ ] 定时任务
-    - [ ] 定时执行
-    - [x] 开始/暂停按钮
-- [ ] 对比目标抓取方式
-    - [ ] 正则表达式
-    - [ ] lxml
-- [ ] 邮件提醒
-- [ ] 配置邮件账号和密码
-- [ ] 抓取模板定制
 
 ## 笔记
 ### docker 镜像加速
