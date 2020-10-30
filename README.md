@@ -70,6 +70,8 @@ docker run -d -p 8007:80 --name=watchman watchman
 ```
 docker pull elliotxx/watchman
 docker run -d -p 8007:80 --name=watchman elliotxx/watchman
+# 指定数据盘挂载目录 示例
+docker run -d -p 8007:80 -v /home/yym/watchman/data:/data --name=watchman elliotxx/watchman
 ```
 
 或者使用 阿里云容器镜像服务 拉取镜像（国内加速）
@@ -77,6 +79,8 @@ docker run -d -p 8007:80 --name=watchman elliotxx/watchman
 ```
 docker pull registry.cn-shanghai.aliyuncs.com/elliotxx/watchman
 docker run -d -p 8007:80 --name=watchman registry.cn-shanghai.aliyuncs.com/elliotxx/watchman
+# 指定数据盘挂载目录 示例
+docker run -d -p 8007:80 -v /home/yym/watchman/data:/data --name=watchman registry.cn-shanghai.aliyuncs.com/elliotxx/watchman
 ```
 浏览器访问 ```127.0.0.1:8007``` 查看效果
 
