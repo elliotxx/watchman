@@ -27,9 +27,7 @@ ENV GO111MODULE=on
 ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
 RUN go mod tidy
 # 编译，生成二进制文件
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static" -o cmd/watchman cmd/main.go
-
-
+RUN CGO_ENABLED=1 GOOS=linux go build --ldflags '-linkmode external -extldflags "-static -s -w"' -o cmd/watchman cmd/main.go
 
 # 运行层
 FROM alpine:3.7 AS production
@@ -44,6 +42,8 @@ ENV GIN_PORT=8080
 ENV TMPDIR="/data"
 # 容器中支持中文
 ENV LANG=C.UTF-8
+# 设置go语言的默认DNS解析方式 纯go
+ENV GODEBUG=netdns=go
 
 # 安装必要工具，设置 alpine 的镜像地址为阿里云的地址
 RUN echo "https://mirrors.aliyun.com/alpine/v3.6/main/" > /etc/apk/repositories \
