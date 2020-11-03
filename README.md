@@ -238,6 +238,20 @@ ref：https://segmentfault.com/q/1010000012959395
 
 ref：https://blog.csdn.net/kwy15732621629/article/details/78475021
 
+### 运行镜像报 dns 相关错误：device or resource busy
+原因是 docker 在 Dockerfile 中运行 docker build 的时候，会产生一些 dns 问题
+
+在 Dockerfile 中添加一下环境变量，设置 go 语言的默认 dns 解析采用纯 go 的方式（另外一种是 cgo）
+```
+GODEBUG=netdns=go
+```
+
+具体可参考 commit [fix: bug for docker dns problem](https://github.com/elliotxx/watchman/commit/4f97389897d61ca1a7bafefacd42bbbcb01c052c)
+
+ref: 
+* [golang中的dns问题](https://blog.csdn.net/wllenyj/article/details/86316629)
+* [fabcar example: fatal error: unexpected signal during runtime execution 'signal SIGSEGV: segmentation violation code=0x1 addr=0x63 pc=0x7f84bc4ea259'](https://stackoverflow.com/questions/55688884/fabcar-example-fatal-error-unexpected-signal-during-runtime-execution-signal)
+
 ## 参考资料
 * 程序员笔记——如何编写优雅的Dockerfile  
 https://studygolang.com/articles/20102
