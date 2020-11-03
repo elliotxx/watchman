@@ -9,7 +9,7 @@ Watchman 采用前后端分离设计，数据库采用 Sqlite3，整体十分轻
 
 设计思路见：[一个基于 Golang + React 的定时任务可视化配置网站的设计与实现](http://yangyingming.com/article/454/)
 
-在线 Demo：[http://watch.yangyingming.com](http://watch.yangyingming.com)
+在线 Demo：[http://watchman-demo.yangyingming.com](http://watchman-demo.yangyingming.com)
 
 **默认登录账号：admin 密码：12345**
 
