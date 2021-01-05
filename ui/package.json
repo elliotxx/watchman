@@ -5,7 +5,7 @@
   "dependencies": {
     "antcloud-react-crons": "^1.7.7",
     "antd": "^3.23.4",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-markdown": "^4.2.2",
