@@ -1,4 +1,9 @@
 ## 简介
+
+[![GitHub release](https://img.shields.io/github/release/elliotxx/watchman.svg)](https://github.com/elliotxx/watchman/releases)
+[![Github All Releases](https://img.shields.io/github/downloads/elliotxx/watchman/total.svg)](https://github.com/elliotxx/watchman/releases)
+[![license](https://img.shields.io/github/license/elliotxx/watchman.svg)](https://github.com/elliotxx/watchman/blob/master/LICENSE)
+
 更夫（watchman）是一款可视化定时任务配置工具，集成有Web端交互界面、正则表达式解析、定时任务、邮件提醒、模板定制等功能。
 
 简单来说，Watchman 是一个 Web 应用程序，可以可视化的配置定时任务，通过指定抓取规则定时获取最新内容，如果有更新，就发送邮件通知。
